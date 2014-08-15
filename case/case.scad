@@ -33,6 +33,8 @@ translate([0, 0, -10]) {
 */
 
 // the top
+
+rotate([0,-90,-90])
 color("white")
 difference() {
 
