@@ -21,7 +21,9 @@
 #define CHAR_WIDTH_PX 42
 #define DISPLAY_WIDTH_CHAR 4
 
-#define INITIAL_TIME_MS 300000
+//#define INITIAL_TIME_MS 300000
+#define INITIAL_TIME_MS 300
+
 
 int active_player = CLOCK_STOP;
 volatile int button_pressed = CLOCK_STOP;
@@ -114,6 +116,7 @@ void loop() {
   if (active_player != CLOCK_STOP) {
     if (players[active_player].time_remaining_ms <= 0) {
       active_player = CLOCK_STOP;
+      button_pressed = CLOCK_STOP;
       return;
     }
     players[active_player].time_remaining_ms -= (millis() - players[active_player].last_update_ms);
@@ -147,12 +150,16 @@ void loop() {
     Serial.print("post active_player: ");
     Serial.println(active_player);    
   }     
-  /* TODO:
-  * flag
-  * -- don't fuck up the clock states/button press on 0 seconds
-  * reset
-  * right justify text
-  * handle losing seconds]
+  /* 
+  * TODO:
+  * case
+  * flag - P0 BLOCKER S0
+  * -- have graphical representation of flag
+  * wiring diagram - P2 S3
+  * reset button (chronos style?) - P1
+  * time setting - P1
+  * OLEDs
+  * 
   */
 
 }
