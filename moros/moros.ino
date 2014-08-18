@@ -33,19 +33,19 @@ public:
 
   Button(int interrupt_number, void (*interrupt_handler)()) {
     attachInterrupt(interrupt_number, interrupt_handler, RISING);
-  }
+  };
+
+  static inline void handle_button_interrupt(int button) {
+    button_pressed = button;
+  };
 };
 volatile int Button::button_pressed = NONE;
 
-inline void handle_button_interrupt(int button) {
-  Button::button_pressed = button;
-}
-
 void handle_button_interrupt_0() {
-  handle_button_interrupt(0);
+  Button::handle_button_interrupt(0);
 }
 void handle_button_interrupt_1() {
-  handle_button_interrupt(1);
+  Button::handle_button_interrupt(1);
 }
 
 class Screen {
@@ -92,6 +92,10 @@ public:
     last_update_ms = 0;
   };
 
+  void start() {
+    last_update_ms = millis();
+  };
+
   void update() {
     unsigned long time_since_last_update_ms = millis() - last_update_ms;
     if (time_remaining_ms < time_since_last_update_ms) {
@@ -123,6 +127,11 @@ public:
     static char timea[12];
     ltoa(clock->time_remaining_ms/100, timea, 10);
     screen->display_text(timea);
+  };
+
+  void tick() {
+    clock->update();
+    update_display();
   };
 
 
@@ -157,6 +166,7 @@ void setup(void) {
 
   for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
     players[i]->init();
+    players[i]->clock->start();
     players[i]->update_display();
   }
 
@@ -173,8 +183,7 @@ void loop() {
       return;
     }
 
-    players[active_player]->clock->update();
-    players[active_player]->update_display();
+    players[active_player]->tick();
   }
 
   if ((active_player == NONE || Button::button_pressed == active_player) && Button::button_pressed != NONE)   {
