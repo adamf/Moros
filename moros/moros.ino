@@ -31,13 +31,6 @@ public:
   static inline void handle_button_interrupt(int button);
 };
 
-void handle_button_interrupt_0() {
-  Button::handle_button_interrupt(0);
-}
-void handle_button_interrupt_1() {
-  Button::handle_button_interrupt(1);
-}
-
 class Screen {
 private:
   char prev_text[12];
@@ -136,19 +129,22 @@ public:
   }
 };
 
+void handle_interrupt_0();
+void handle_interrupt_1();
+
 class Controller {
 public:
   Player *players[2];
   static int active_player;
-  static int interrupt_fired;
+  volatile static int interrupt_fired;
 
   Controller() {
     players[0] = new Player(
-     new Button(0, handle_button_interrupt_0),
+     new Button(0, handle_interrupt_0),
      new Screen(4,5,6)
     );
     players[1] = new Player(
-     new Button(1, handle_button_interrupt_1),
+     new Button(1, handle_interrupt_1),
       new Screen(7,8,9)
     );
 
@@ -163,7 +159,7 @@ public:
   };
 
   // called from the actual interrupt handler. be quick.
-  void handle_button_interrupt(int interrupt_number) {
+  static void handle_interrupt(int interrupt_number) {
     interrupt_fired = interrupt_number;
   };
 
@@ -215,13 +211,16 @@ public:
   }
 };
 int Controller::active_player = NONE;
-int Controller::interrupt_fired = NONE;
+volatile int Controller::interrupt_fired = NONE;
 
 Controller controller;
 
-void Button::handle_button_interrupt(int button) {
-  controller.handle_button_interrupt(button);
-};
+void handle_interrupt_0() {
+  Controller::handle_interrupt(0);
+}
+void handle_interrupt_1() {
+  Controller::handle_interrupt(1);
+}
 
 void setup(void) {
   Serial.begin(115200);
