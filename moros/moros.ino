@@ -155,16 +155,20 @@ void loop() {
  // Serial.println(button_pressed);
 
   if (active_player != NONE) {
+    // Check for flag
     if (players[active_player].time_remaining_ms <= 0) {
       active_player = NONE;
       button_pressed = NONE;
       return;
     }
+
+    // Update the active player's timer and display
     update_timer(&players[active_player]);
     update_display(&players[active_player]);
   }
 
   if ((active_player == NONE || button_pressed == active_player) && button_pressed != NONE)   {
+    // handle button press
     Serial.print("pre button_pressed: ");
     Serial.println(button_pressed);
     Serial.print("pre active_player: ");
