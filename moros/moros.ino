@@ -1,5 +1,6 @@
 #include <SPI.h>
 #include <TFT.h>
+#include "printf.h"
 
 #define NONE -1
 
@@ -132,7 +133,7 @@ void update_display(player *p) {
 
 void setup(void) {
   Serial.begin(115200);
-  Serial.println("Initializing...");
+  serprintf("Initializing...");
 
   for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
     init_display(&players[i]);
@@ -140,7 +141,7 @@ void setup(void) {
     attachInterrupt(players[i].interrupt_number, players[i].handle_button_press, RISING);
   }
 
-  Serial.println("done.");
+  serprintf("done.\r\n");
   //delay(100);
   //exit(1);
 }
@@ -149,10 +150,9 @@ void setup(void) {
 int loop_count = 0;
 void loop() {
   if (loop_count == 0) {
-    Serial.println("in loop");
+    serprintf("in loop\r\n");
     loop_count++;
   }
- // Serial.println(button_pressed);
 
   if (active_player != NONE) {
     // Check for flag
@@ -169,16 +169,11 @@ void loop() {
 
   if ((active_player == NONE || button_pressed == active_player) && button_pressed != NONE)   {
     // handle button press
-    Serial.print("pre button_pressed: ");
-    Serial.println(button_pressed);
-    Serial.print("pre active_player: ");
-    Serial.println(active_player);    
+    serprintf("before: active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
     active_player = (button_pressed + 1) % 2;
     players[active_player].last_update_ms = millis();
-    Serial.print("post button_pressed: ");
-    Serial.println(button_pressed);
-    Serial.print("post active_player: ");
-    Serial.println(active_player);    
+    button_pressed = NONE;
+    serprintf("after:  active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
   }     
   /* 
   * TODO:
