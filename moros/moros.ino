@@ -213,6 +213,8 @@ volatile int Controller::interrupt_fired = NONE;
 
 Controller controller;
 
+// We need a separate function for each interrupt because we can't pass any
+// context to the interrupt handler
 void handle_interrupt_0() {
   Controller::handle_interrupt(0);
 }
