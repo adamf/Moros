@@ -20,8 +20,6 @@
 #define INITIAL_TIME_MS 5000
 
 
-int active_player = NONE;
-
 class Button {
 public:
   static volatile int button_pressed;
@@ -141,55 +139,74 @@ public:
   }
 };
 
-Player *players[2] = { 
-  new Player(
-    new Button(0, handle_button_interrupt_0),
-    new Screen(4,5,6)
-  ),
-  new Player(
-    new Button(1, handle_button_interrupt_1),
-    new Screen(7,8,9)
-  )
-};
+class Controller {
+public:
+#define PLAYERS 2
+  Player *players[PLAYERS];
+  static int active_player;
 
-void handle_button_press(int button) {
-  serprintf("button %d pressed\r\n", button);
-  serprintf("before: active_player=%d, button_pressed=%d\r\n", active_player, Button::button_pressed);
-  active_player = (Button::button_pressed + 1) % 2;
-  players[active_player]->clock->last_update_ms = millis();
-  Button::button_pressed = NONE;
-  serprintf("after:  active_player=%d, button_pressed=%d\r\n", active_player, Button::button_pressed);
-}
+  Controller() {
+    players[0] = new Player(
+     new Button(0, handle_button_interrupt_0),
+     new Screen(4,5,6)
+    );
+    players[1] = new Player(
+     new Button(1, handle_button_interrupt_1),
+      new Screen(7,8,9)
+    );
+
+  }
+
+  void init() {
+    for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
+      players[i]->init();
+      players[i]->clock->start();
+      players[i]->update_display();
+    }
+  };
+
+  void handle_button_press(int button) {
+    serprintf("button %d pressed\r\n", button);
+    serprintf("before: active_player=%d, button_pressed=%d\r\n", active_player, Button::button_pressed);
+    active_player = (Button::button_pressed + 1) % 2;
+    players[active_player]->clock->last_update_ms = millis();
+    Button::button_pressed = NONE;
+    serprintf("after:  active_player=%d, button_pressed=%d\r\n", active_player, Button::button_pressed);
+  }
+
+  void tick() {
+    if (active_player != NONE) {
+      if (players[active_player]->out_of_time()) {
+        serprintf("Flag fell for player %d\r\n", active_player);
+        active_player = NONE;
+        Button::button_pressed = NONE;
+        return;
+      }
+
+      players[active_player]->tick();
+    }
+
+    if ((active_player == NONE || Button::button_pressed == active_player) && Button::button_pressed != NONE)   {
+      handle_button_press(Button::button_pressed);
+    }     
+  }
+};
+int Controller::active_player = NONE;
+
+Controller controller;
 
 void setup(void) {
   Serial.begin(115200);
   serprintf("Initializing...");
 
-  for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
-    players[i]->init();
-    players[i]->clock->start();
-    players[i]->update_display();
-  }
+  controller.init();
 
   serprintf("done.\r\n");
 }
 
 
 void loop() {
-  if (active_player != NONE) {
-    if (players[active_player]->out_of_time()) {
-      serprintf("Flag fell for player %d\r\n", active_player);
-      active_player = NONE;
-      Button::button_pressed = NONE;
-      return;
-    }
-
-    players[active_player]->tick();
-  }
-
-  if ((active_player == NONE || Button::button_pressed == active_player) && Button::button_pressed != NONE)   {
-    handle_button_press(Button::button_pressed);
-  }     
+  controller.tick();
 
 }
 
