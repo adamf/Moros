@@ -28,11 +28,15 @@
 int active_player = CLOCK_STOP;
 volatile int button_pressed = CLOCK_STOP;
 
+inline void handle_button_press(int button) {
+  button_pressed = button;
+}
+
 void handle_button_press_1() {
-  button_pressed = 0;
+  handle_button_press(1);
 }
 void handle_button_press_2() {
-  button_pressed = 1;
+  handle_button_press(2);
 }
 
 typedef struct {
