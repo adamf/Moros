@@ -55,26 +55,24 @@ Button buttons[2] = {
   }
 };
 
-typedef struct {
-  unsigned int cs_pin;
-  unsigned int dc_pin;
-  unsigned int rst_pin;
+class Screen {
+public:
   TFT *tft;
-} Screen;
+  Screen(unsigned int cs_pin, unsigned int dc_pin, unsigned int rst_pin) {
+    tft = new TFT(cs_pin, dc_pin, rst_pin);
+  };
+  void init() {
+    tft->begin();
+    tft->background(0,0,0);
+    tft->stroke(255,255,255);
+    tft->fill(0,0,0);
+    tft->setTextSize(DISPLAY_FONT_SIZE);
+  };
+};
 
-Screen screens[2] = {
-  {
-    .cs_pin = 4,
-    .dc_pin = 5,
-    .rst_pin = 6,
-    .tft = NULL
-  },
-  {
-    .cs_pin = 7,
-    .dc_pin = 8,
-    .rst_pin = 9,
-    .tft = NULL
-  }
+Screen *screens[2] = {
+  new Screen(4,5,6),
+  new Screen(7,8,9)
 };
 
 typedef struct {
@@ -96,25 +94,19 @@ Player players[2] = {
     .display_width_chars = 0,
     .clock = new Clock,
     .button = &buttons[0],
-    .screen = &screens[0]
+    .screen = screens[0]
   },
   {
     .display_time = {},
     .display_width_chars = 0,
     .clock = new Clock,
     .button = &buttons[1],
-    .screen = &screens[1]
+    .screen = screens[1]
   }
 };
 
 void init_player(Player *p) {
-  Screen *screen = p->screen;
-  screen->tft = new TFT(screen->cs_pin, screen->dc_pin, screen->rst_pin);
-  screen->tft->begin();
-  screen->tft->background(0,0,0);
-  screen->tft->stroke(255,255,255);
-  screen->tft->fill(0,0,0);
-  screen->tft->setTextSize(DISPLAY_FONT_SIZE);
+  p->screen->init();
   Clock *clock = p->clock;
   clock->time_remaining_ms = INITIAL_TIME_MS;
   clock->last_update_ms = 0;
