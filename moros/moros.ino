@@ -47,8 +47,7 @@ typedef struct {
   void (* handle_button_press)();
 } player;
 
-#define PLAYER_COUNT 2
-player players[PLAYER_COUNT] = { 
+player players[2] = { 
   {
     INITIAL_TIME_MS,
     0,
@@ -78,7 +77,7 @@ void setup(void) {
   Serial.println("hello!");
 
   char timea[12];
-  for(int i = 0; i < PLAYER_COUNT; i++) {
+  for(int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
     players[i].tft.begin();
     players[i].tft.background(0,0,0);
     players[i].tft.stroke(255,255,255);
