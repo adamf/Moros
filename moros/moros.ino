@@ -139,8 +139,7 @@ public:
 
 class Controller {
 public:
-#define PLAYERS 2
-  Player *players[PLAYERS];
+  Player *players[2];
   static int active_player;
 
   Controller() {
