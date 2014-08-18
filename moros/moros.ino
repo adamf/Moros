@@ -1,3 +1,15 @@
+/* 
+* TODO:
+* case
+* flag - P0 BLOCKER S0
+* -- have graphical representation of flag
+* wiring diagram - P2 S3
+* reset button (chronos style?) - P1
+* time setting - P1
+* OLEDs
+* 
+*/
+
 #include <SPI.h>
 #include <TFT.h>
 #include "printf.h"
@@ -175,17 +187,6 @@ void loop() {
     button_pressed = NONE;
     serprintf("after:  active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
   }     
-  /* 
-  * TODO:
-  * case
-  * flag - P0 BLOCKER S0
-  * -- have graphical representation of flag
-  * wiring diagram - P2 S3
-  * reset button (chronos style?) - P1
-  * time setting - P1
-  * OLEDs
-  * 
-  */
 
 }
 
