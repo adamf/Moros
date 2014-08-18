@@ -27,8 +27,6 @@ public:
     interrupt_number = interrupt_number_;
     attachInterrupt(interrupt_number, interrupt_handler, RISING);
   };
-
-  static inline void handle_button_interrupt(int button);
 };
 
 class Screen {
