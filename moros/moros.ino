@@ -115,46 +115,46 @@ public:
   };
 };
 
-typedef struct {
+class Player {
+public:
   Clock *clock;
   Button *button;
   Screen *screen;
-} Player;
 
-Player players[2] = { 
-  {
-    .clock = new Clock,
-    .button = &buttons[0],
-    .screen = screens[0]
-  },
-  {
-    .clock = new Clock,
-    .button = &buttons[1],
-    .screen = screens[1]
+  Player(Button *button_, Screen *screen_) {
+    clock = new Clock();
+    button = button_;
+    screen = screen_;
+  };
+
+  void init() {
+    screen->init();
+  };
+
+  void update_display() {
+    static char timea[12];
+    ltoa(clock->time_remaining_ms/100, timea, 10);
+    screen->display_text(timea);
+  };
+
+
+  int out_of_time() {
+    return clock->time_remaining_ms <= 0;
   }
 };
 
-void init_player(Player *p) {
-  p->screen->init();
-}
-
-void update_display(Player *p) {
-  static char timea[12];
-  ltoa(p->clock->time_remaining_ms/100, timea, 10);
-  p->screen->display_text(timea);
-}
+Player *players[2] = { 
+  new Player(&buttons[0], screens[0]),
+  new Player(&buttons[1], screens[1])
+};
 
 void handle_button_press(int button) {
   serprintf("button %d pressed\r\n", button);
   serprintf("before: active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
   active_player = (button_pressed + 1) % 2;
-  players[active_player].clock->last_update_ms = millis();
+  players[active_player]->clock->last_update_ms = millis();
   button_pressed = NONE;
   serprintf("after:  active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
-}
-
-int out_of_time(Player *p) {
-  return p->clock->time_remaining_ms <= 0;
 }
 
 void setup(void) {
@@ -162,9 +162,9 @@ void setup(void) {
   serprintf("Initializing...");
 
   for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
-    init_player(&players[i]);
-    update_display(&players[i]);
-    attachInterrupt(players[i].button->interrupt_number, players[i].button->interrupt_handler, RISING);
+    players[i]->init();
+    players[i]->update_display();
+    attachInterrupt(players[i]->button->interrupt_number, players[i]->button->interrupt_handler, RISING);
   }
 
   serprintf("done.\r\n");
@@ -173,15 +173,15 @@ void setup(void) {
 
 void loop() {
   if (active_player != NONE) {
-    if (out_of_time(&players[active_player])) {
+    if (players[active_player]->out_of_time()) {
       serprintf("Flag fell for player %d\r\n", active_player);
       active_player = NONE;
       button_pressed = NONE;
       return;
     }
 
-    players[active_player].clock->update();
-    update_display(&players[active_player]);
+    players[active_player]->clock->update();
+    players[active_player]->update_display();
   }
 
   if ((active_player == NONE || button_pressed == active_player) && button_pressed != NONE)   {
