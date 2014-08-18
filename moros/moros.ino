@@ -73,7 +73,6 @@ public:
 
   void display_text(const char *text) {
     for(unsigned int i = 0; i < strlen(text); i++) {
-      tft->text(text, 0, 20); // ???
       if(text[i] != prev_text[i]) {
 
         // erase this character cell
