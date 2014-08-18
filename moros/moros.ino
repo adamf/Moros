@@ -22,15 +22,14 @@
 
 class Button {
 public:
-  static volatile int button_pressed;
-
-  Button(int interrupt_number, void (*interrupt_handler)()) {
+  int interrupt_number;
+  Button(int interrupt_number_, void (*interrupt_handler)()) {
+    interrupt_number = interrupt_number_;
     attachInterrupt(interrupt_number, interrupt_handler, RISING);
   };
 
   static inline void handle_button_interrupt(int button);
 };
-volatile int Button::button_pressed = NONE;
 
 void handle_button_interrupt_0() {
   Button::handle_button_interrupt(0);
@@ -141,6 +140,7 @@ class Controller {
 public:
   Player *players[2];
   static int active_player;
+  static int interrupt_fired;
 
   Controller() {
     players[0] = new Player(
@@ -162,37 +162,47 @@ public:
     }
   };
 
-  void handle_button_interrupt(int button) {
-    Button::button_pressed = button;
+  // called from the actual interrupt handler. be quick.
+  void handle_button_interrupt(int interrupt_number) {
+    interrupt_fired = interrupt_number;
   };
 
-  void handle_button_press(int button) {
-    serprintf("button %d pressed\r\n", button);
-    serprintf("before: active_player=%d, button_pressed=%d\r\n", active_player, Button::button_pressed);
-    active_player = (Button::button_pressed + 1) % 2;
-    players[active_player]->clock->last_update_ms = millis();
-    Button::button_pressed = NONE;
-    serprintf("after:  active_player=%d, button_pressed=%d\r\n", active_player, Button::button_pressed);
+  int interrupt_to_player(int interrupt_number) {
+    for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
+      if (players[i]->button->interrupt_number == interrupt_number)
+        return i;
+    }
+    serprintf("received interrupt %d, but no player has a button on that interrupt!\r\n", interrupt_number);
+    return NULL;
   }
 
   void tick() {
+    if (interrupt_fired != NONE) {
+      // Someone pressed a button since the last time we checked.
+      int player = interrupt_to_player(interrupt_fired);
+
+      if (active_player == NONE || player == active_player) {
+        active_player = (player+1) % 2;
+        players[active_player]->clock->start();
+      } else {
+        serprintf("Ignoring button press for player %d\r\n", player);
+      }
+      interrupt_fired = NONE;
+    }
+
     if (active_player != NONE) {
       if (players[active_player]->out_of_time()) {
         serprintf("Flag fell for player %d\r\n", active_player);
         active_player = NONE;
-        Button::button_pressed = NONE;
         return;
       }
 
       players[active_player]->tick();
     }
-
-    if ((active_player == NONE || Button::button_pressed == active_player) && Button::button_pressed != NONE)   {
-      handle_button_press(Button::button_pressed);
-    }     
   }
 };
 int Controller::active_player = NONE;
+int Controller::interrupt_fired = NONE;
 
 Controller controller;
 
