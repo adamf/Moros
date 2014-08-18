@@ -73,8 +73,8 @@ player players[2] = {
 // does the SPI library allow selecting of which SS to issue the command on?
 
 void setup(void) {
-  Serial.begin(9600);
-  Serial.println("hello!");
+  Serial.begin(115200);
+  Serial.println("Initializing...");
 
   char timea[12];
   for(int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
@@ -87,13 +87,10 @@ void setup(void) {
     ltoa(players[i].time_remaining_ms/100, timea, 10);
     strncpy(players[i].display_time, timea, 12);
     players[i].tft.text(timea, 0, 20);
-    Serial.println("handle button press:");
-    Serial.println((int)players[i].handle_button_press);
-    Serial.println(players[i].interrupt_number);
     attachInterrupt(players[i].interrupt_number, players[i].handle_button_press, RISING);
   }
 
-  Serial.println("init");
+  Serial.println("done.");
   //delay(100);
   //exit(1);
 }
