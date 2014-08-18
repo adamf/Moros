@@ -6,8 +6,6 @@
 #define cs_2   7
 #define dc_2   8
 #define rst_2  9
-#define btn_1_interrupt 0
-#define btn_2_interrupt 1
 
 #include <SPI.h>
 #include <TFT.h>
@@ -38,12 +36,28 @@ void handle_button_press_2() {
 }
 
 typedef struct {
+  unsigned int interrupt_number;
+  void (*handler)();
+} button;
+
+button buttons[2] = {
+  {
+    interrupt_number: 0,
+    handler: handle_button_press_1
+  },
+  {
+    interrupt_number: 1,
+    handler: handle_button_press_2
+  }
+};
+
+typedef struct {
   long time_remaining_ms;
   long last_update_ms;
   TFT tft;
   char display_time[12];
   int display_width_chars;
-  int interrupt_number;
+  unsigned int interrupt_number;
   void (* handle_button_press)();
 } player;
 
@@ -54,8 +68,8 @@ player players[2] = {
     TFT(cs_1, dc_1, rst_1),
     "",
     0,
-    btn_1_interrupt,
-    handle_button_press_1
+    buttons[0].interrupt_number,
+    buttons[0].handler
   },
   {
     INITIAL_TIME_MS,
@@ -63,8 +77,8 @@ player players[2] = {
     TFT(cs_2, dc_2, rst_2),
     "",
     0,
-    btn_2_interrupt,
-    handle_button_press_2
+    buttons[1].interrupt_number,
+    buttons[1].handler
   }
 };
 
@@ -77,7 +91,7 @@ void setup(void) {
   Serial.println("Initializing...");
 
   char timea[12];
-  for(int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
+  for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
     players[i].tft.begin();
     players[i].tft.background(0,0,0);
     players[i].tft.stroke(255,255,255);
@@ -115,7 +129,7 @@ void loop() {
     long display_time = players[active_player].time_remaining_ms/100;
 
     ltoa(display_time, timea, 10);
-    for(int i = 0; i < strlen(players[active_player].display_time); i++) {
+    for(unsigned int i = 0; i < strlen(players[active_player].display_time); i++) {
       if(timea[i] != players[active_player].display_time[i]) {
           
         // draw a rect
