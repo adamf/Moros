@@ -67,11 +67,13 @@ Screen screens[2] = {
     .cs_pin = 4,
     .dc_pin = 5,
     .rst_pin = 6,
+    .tft = NULL
   },
   {
     .cs_pin = 7,
     .dc_pin = 8,
     .rst_pin = 9,
+    .tft = NULL
   }
 };
 
