@@ -126,10 +126,11 @@ void update_changed_chars(Player *p, const char *text) {
     screen->tft->text(text, 0, 20);
     if(text[i] != p->display_time[i]) {
 
-      // draw a rect
+      // erase this character cell
       screen->tft->stroke(0,0,0);
       screen->tft->rect(CHAR_WIDTH_PX * i , 20, CHAR_WIDTH_PX, CHAR_HEIGHT_PX);
-      //p->tft->background(0,0,0);
+
+      // print the new character
       char next_char[2] = {text[i], '\0' };
       screen->tft->stroke(255,255,255);
       screen->tft->text(next_char, CHAR_WIDTH_PX * i, 20);
