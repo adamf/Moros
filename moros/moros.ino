@@ -59,55 +59,58 @@ typedef struct {
   unsigned int cs_pin;
   unsigned int dc_pin;
   unsigned int rst_pin;
+  TFT *tft;
 } Screen;
 
 Screen screens[2] = {
   {
     .cs_pin = 4,
     .dc_pin = 5,
-    .rst_pin = 6
+    .rst_pin = 6,
   },
   {
     .cs_pin = 7,
     .dc_pin = 8,
-    .rst_pin = 9
+    .rst_pin = 9,
   }
 };
 
 typedef struct {
   long time_remaining_ms;
   long last_update_ms;
-  TFT tft;
   char display_time[12];
   int display_width_chars;
   Button *button;
+  Screen *screen;
 } player;
 
 player players[2] = { 
   {
     .time_remaining_ms = INITIAL_TIME_MS,
     .last_update_ms = 0,
-    .tft = TFT(screens[0].cs_pin, screens[0].dc_pin, screens[0].rst_pin),
     .display_time = {},
     .display_width_chars = 0,
-    .button = &buttons[0]
+    .button = &buttons[0],
+    .screen = &screens[0]
   },
   {
     .time_remaining_ms = INITIAL_TIME_MS,
     .last_update_ms = 0,
-    .tft = TFT(screens[1].cs_pin, screens[1].dc_pin, screens[1].rst_pin),
     .display_time = {},
     .display_width_chars = 0,
-    .button = &buttons[1]
+    .button = &buttons[1],
+    .screen = &screens[1]
   }
 };
 
 void init_display(player *p) {
-  p->tft.begin();
-  p->tft.background(0,0,0);
-  p->tft.stroke(255,255,255);
-  p->tft.fill(0,0,0);
-  p->tft.setTextSize(DISPLAY_FONT_SIZE);
+  Screen *screen = p->screen;
+  screen->tft = new TFT(screen->cs_pin, screen->dc_pin, screen->rst_pin);
+  screen->tft->begin();
+  screen->tft->background(0,0,0);
+  screen->tft->stroke(255,255,255);
+  screen->tft->fill(0,0,0);
+  screen->tft->setTextSize(DISPLAY_FONT_SIZE);
 }
 
 void update_timer(player *p) {
@@ -116,17 +119,18 @@ void update_timer(player *p) {
 }
 
 void update_changed_chars(player *p, const char *text) {
+  Screen *screen = p->screen;
   for(unsigned int i = 0; i < strlen(text); i++) {
-    p->tft.text(text, 0, 20);
+    screen->tft->text(text, 0, 20);
     if(text[i] != p->display_time[i]) {
 
       // draw a rect
-      p->tft.stroke(0,0,0);
-      p->tft.rect(CHAR_WIDTH_PX * i , 20, CHAR_WIDTH_PX, CHAR_HEIGHT_PX);
-      //p->tft.background(0,0,0);
+      screen->tft->stroke(0,0,0);
+      screen->tft->rect(CHAR_WIDTH_PX * i , 20, CHAR_WIDTH_PX, CHAR_HEIGHT_PX);
+      //p->tft->background(0,0,0);
       char next_char[2] = {text[i], '\0' };
-      p->tft.stroke(255,255,255);
-      p->tft.text(next_char, CHAR_WIDTH_PX * i, 20);
+      screen->tft->stroke(255,255,255);
+      screen->tft->text(next_char, CHAR_WIDTH_PX * i, 20);
     }
   }
   strncpy(p->display_time, text, sizeof(p->display_time));
