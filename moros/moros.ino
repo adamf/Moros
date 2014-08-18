@@ -84,9 +84,9 @@ typedef struct {
   int display_width_chars;
   Button *button;
   Screen *screen;
-} player;
+} Player;
 
-player players[2] = { 
+Player players[2] = { 
   {
     .time_remaining_ms = INITIAL_TIME_MS,
     .last_update_ms = 0,
@@ -105,7 +105,7 @@ player players[2] = {
   }
 };
 
-void init_display(player *p) {
+void init_display(Player *p) {
   Screen *screen = p->screen;
   screen->tft = new TFT(screen->cs_pin, screen->dc_pin, screen->rst_pin);
   screen->tft->begin();
@@ -115,12 +115,12 @@ void init_display(player *p) {
   screen->tft->setTextSize(DISPLAY_FONT_SIZE);
 }
 
-void update_timer(player *p) {
+void update_timer(Player *p) {
   p->time_remaining_ms -= (millis() - p->last_update_ms);
   p->last_update_ms = millis();
 }
 
-void update_changed_chars(player *p, const char *text) {
+void update_changed_chars(Player *p, const char *text) {
   Screen *screen = p->screen;
   for(unsigned int i = 0; i < strlen(text); i++) {
     screen->tft->text(text, 0, 20);
@@ -138,7 +138,7 @@ void update_changed_chars(player *p, const char *text) {
   strncpy(p->display_time, text, sizeof(p->display_time));
 }
 
-void update_display(player *p) {
+void update_display(Player *p) {
   static char timea[12];
   ltoa(p->time_remaining_ms/100, timea, 10);
   update_changed_chars(p, timea);
@@ -153,7 +153,7 @@ void handle_button_press(int button) {
   serprintf("after:  active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
 }
 
-int out_of_time(player *p) {
+int out_of_time(Player *p) {
   return p->time_remaining_ms <= 0;
 }
 
