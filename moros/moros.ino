@@ -20,7 +20,7 @@
 #define DISPLAY_WIDTH_CHAR 4
 
 //#define INITIAL_TIME_MS 300000
-#define INITIAL_TIME_MS 300
+#define INITIAL_TIME_MS 5000
 
 
 int active_player = CLOCK_STOP;
