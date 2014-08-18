@@ -92,7 +92,41 @@ player players[2] = {
   }
 };
 
+void init_display(player *p) {
+  p->tft.begin();
+  p->tft.background(0,0,0);
+  p->tft.stroke(255,255,255);
+  p->tft.fill(0,0,0);
+  p->tft.setTextSize(DISPLAY_FONT_SIZE);
+}
 
+void update_timer(player *p) {
+  p->time_remaining_ms -= (millis() - p->last_update_ms);
+  p->last_update_ms = millis();
+}
+
+void incrementally_update_text(player *p, const char *text) {
+  for(unsigned int i = 0; i < strlen(text); i++) {
+    p->tft.text(text, 0, 20);
+    if(text[i] != p->display_time[i]) {
+
+      // draw a rect
+      p->tft.stroke(0,0,0);
+      p->tft.rect(CHAR_WIDTH_PX * i , 20, CHAR_WIDTH_PX, CHAR_HEIGHT_PX);
+      //p->tft.background(0,0,0);
+      char next_char[2] = {text[i], '\0' };
+      p->tft.stroke(255,255,255);
+      p->tft.text(next_char, CHAR_WIDTH_PX * i, 20);
+    }
+  }
+  strncpy(p->display_time, text, sizeof(p->display_time));
+}
+
+void update_display(player *p) {
+  static char timea[12];
+  ltoa(p->time_remaining_ms/100, timea, 10);
+  incrementally_update_text(p, timea);
+}
 
 // does the SPI library allow selecting of which SS to issue the command on?
 
@@ -100,17 +134,9 @@ void setup(void) {
   Serial.begin(115200);
   Serial.println("Initializing...");
 
-  char timea[12];
   for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
-    players[i].tft.begin();
-    players[i].tft.background(0,0,0);
-    players[i].tft.stroke(255,255,255);
-    players[i].tft.fill(0,0,0);
-    players[i].tft.setTextSize(DISPLAY_FONT_SIZE);
-//    Serial.println(players[i].tft.width());
-    ltoa(players[i].time_remaining_ms/100, timea, 10);
-    strncpy(players[i].display_time, timea, 12);
-    players[i].tft.text(timea, 0, 20);
+    init_display(&players[i]);
+    update_display(&players[i]);
     attachInterrupt(players[i].interrupt_number, players[i].handle_button_press, RISING);
   }
 
@@ -122,37 +148,22 @@ void setup(void) {
 
 int loop_count = 0;
 void loop() {
-  char timea[12];
   if (loop_count == 0) {
     Serial.println("in loop");
     loop_count++;
   }
  // Serial.println(button_pressed);
+
   if (active_player != NONE) {
     if (players[active_player].time_remaining_ms <= 0) {
       active_player = NONE;
       button_pressed = NONE;
       return;
     }
-    players[active_player].time_remaining_ms -= (millis() - players[active_player].last_update_ms);
-    players[active_player].last_update_ms = millis();
-    long display_time = players[active_player].time_remaining_ms/100;
-
-    ltoa(display_time, timea, 10);
-    for(unsigned int i = 0; i < strlen(players[active_player].display_time); i++) {
-      if(timea[i] != players[active_player].display_time[i]) {
-          
-        // draw a rect
-        players[active_player].tft.stroke(0,0,0);
-        players[active_player].tft.rect(CHAR_WIDTH_PX * i , 20, CHAR_WIDTH_PX, CHAR_HEIGHT_PX);
-        //players[active_player].tft.background(0,0,0);
-        char timeb[2] = {timea[i], '\0' };
-        players[active_player].tft.stroke(255,255,255);
-        players[active_player].tft.text(timeb, CHAR_WIDTH_PX * i, 20);
-      }
-    }
-    strncpy(players[active_player].display_time, timea, sizeof(players[active_player].display_time));
+    update_timer(&players[active_player]);
+    update_display(&players[active_player]);
   }
+
   if ((active_player == NONE || button_pressed == active_player) && button_pressed != NONE)   {
     Serial.print("pre button_pressed: ");
     Serial.println(button_pressed);
