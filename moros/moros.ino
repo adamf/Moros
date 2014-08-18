@@ -1,12 +1,3 @@
-// For the breakout, you can use any (4 or) 5 pins
-
-#define cs_1   4
-#define dc_1   5
-#define rst_1  6 
-#define cs_2   7
-#define dc_2   8
-#define rst_2  9
-
 #include <SPI.h>
 #include <TFT.h>
 
@@ -52,6 +43,25 @@ button buttons[2] = {
 };
 
 typedef struct {
+  unsigned int cs_pin;
+  unsigned int dc_pin;
+  unsigned int rst_pin;
+} screen;
+
+screen screens[2] = {
+  {
+    cs_pin: 4,
+    dc_pin: 5,
+    rst_pin: 6
+  },
+  {
+    cs_pin: 7,
+    dc_pin: 8,
+    rst_pin: 9
+  }
+};
+
+typedef struct {
   long time_remaining_ms;
   long last_update_ms;
   TFT tft;
@@ -65,7 +75,7 @@ player players[2] = {
   {
     INITIAL_TIME_MS,
     0,
-    TFT(cs_1, dc_1, rst_1),
+    TFT(screens[0].cs_pin, screens[0].dc_pin, screens[0].rst_pin),
     "",
     0,
     buttons[0].interrupt_number,
@@ -74,7 +84,7 @@ player players[2] = {
   {
     INITIAL_TIME_MS,
     0,
-    TFT(cs_2, dc_2, rst_2),
+    TFT(screens[1].cs_pin, screens[1].dc_pin, screens[1].rst_pin),
     "",
     0,
     buttons[1].interrupt_number,
