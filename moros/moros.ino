@@ -100,8 +100,6 @@ typedef struct {
 } Clock;
 
 typedef struct {
-  char display_time[12];
-  int display_width_chars;
   Clock *clock;
   Button *button;
   Screen *screen;
@@ -109,15 +107,11 @@ typedef struct {
 
 Player players[2] = { 
   {
-    .display_time = {},
-    .display_width_chars = 0,
     .clock = new Clock,
     .button = &buttons[0],
     .screen = screens[0]
   },
   {
-    .display_time = {},
-    .display_width_chars = 0,
     .clock = new Clock,
     .button = &buttons[1],
     .screen = screens[1]
