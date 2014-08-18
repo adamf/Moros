@@ -56,6 +56,8 @@ Button buttons[2] = {
 };
 
 class Screen {
+private:
+  char prev_text[12];
 public:
   TFT *tft;
   Screen(unsigned int cs_pin, unsigned int dc_pin, unsigned int rst_pin) {
@@ -68,6 +70,24 @@ public:
     tft->fill(0,0,0);
     tft->setTextSize(DISPLAY_FONT_SIZE);
   };
+
+  void display_text(const char *text) {
+    for(unsigned int i = 0; i < strlen(text); i++) {
+      tft->text(text, 0, 20); // ???
+      if(text[i] != prev_text[i]) {
+
+        // erase this character cell
+        tft->stroke(0,0,0);
+        tft->rect(CHAR_WIDTH_PX * i , 20, CHAR_WIDTH_PX, CHAR_HEIGHT_PX);
+
+        // print the new character
+        char next_char[2] = {text[i], '\0' };
+        tft->stroke(255,255,255);
+        tft->text(next_char, CHAR_WIDTH_PX * i, 20);
+      }
+    }
+    strncpy(prev_text, text, sizeof(prev_text));
+  }
 };
 
 Screen *screens[2] = {
@@ -122,29 +142,10 @@ void update_timer(Clock *c) {
   c->last_update_ms = millis();
 }
 
-void update_changed_chars(Player *p, const char *text) {
-  Screen *screen = p->screen;
-  for(unsigned int i = 0; i < strlen(text); i++) {
-    screen->tft->text(text, 0, 20);
-    if(text[i] != p->display_time[i]) {
-
-      // erase this character cell
-      screen->tft->stroke(0,0,0);
-      screen->tft->rect(CHAR_WIDTH_PX * i , 20, CHAR_WIDTH_PX, CHAR_HEIGHT_PX);
-
-      // print the new character
-      char next_char[2] = {text[i], '\0' };
-      screen->tft->stroke(255,255,255);
-      screen->tft->text(next_char, CHAR_WIDTH_PX * i, 20);
-    }
-  }
-  strncpy(p->display_time, text, sizeof(p->display_time));
-}
-
 void update_display(Player *p) {
   static char timea[12];
   ltoa(p->clock->time_remaining_ms/100, timea, 10);
-  update_changed_chars(p, timea);
+  p->screen->display_text(timea);
 }
 
 void handle_button_press(int button) {
