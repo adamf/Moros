@@ -19,11 +19,11 @@ inline void handle_button_press(int button) {
   button_pressed = button;
 }
 
+void handle_button_press_0() {
+  handle_button_press(0);
+}
 void handle_button_press_1() {
   handle_button_press(1);
-}
-void handle_button_press_2() {
-  handle_button_press(2);
 }
 
 typedef struct {
@@ -34,11 +34,11 @@ typedef struct {
 button buttons[2] = {
   {
     .interrupt_number = 0,
-    .handler = handle_button_press_1
+    .handler = handle_button_press_0
   },
   {
     .interrupt_number = 1,
-    .handler = handle_button_press_2
+    .handler = handle_button_press_1
   }
 };
 
