@@ -95,10 +95,25 @@ Screen *screens[2] = {
   new Screen(7,8,9)
 };
 
-typedef struct {
+class Clock {
+public:
   unsigned long time_remaining_ms;
   unsigned long last_update_ms;
-} Clock;
+  Clock() {
+    time_remaining_ms = INITIAL_TIME_MS;
+    last_update_ms = 0;
+  };
+
+  void update() {
+    unsigned long time_since_last_update_ms = millis() - last_update_ms;
+    if (time_remaining_ms < time_since_last_update_ms) {
+      time_remaining_ms = 0;
+    } else {
+      time_remaining_ms -= time_since_last_update_ms;
+    }
+    last_update_ms = millis();
+  };
+};
 
 typedef struct {
   Clock *clock;
@@ -121,19 +136,6 @@ Player players[2] = {
 
 void init_player(Player *p) {
   p->screen->init();
-  Clock *clock = p->clock;
-  clock->time_remaining_ms = INITIAL_TIME_MS;
-  clock->last_update_ms = 0;
-}
-
-void update_timer(Clock *c) {
-  unsigned long time_since_last_update_ms = millis() - c->last_update_ms;
-  if (c->time_remaining_ms < time_since_last_update_ms) {
-    c->time_remaining_ms = 0;
-  } else {
-    c->time_remaining_ms -= time_since_last_update_ms;
-  }
-  c->last_update_ms = millis();
 }
 
 void update_display(Player *p) {
@@ -178,7 +180,7 @@ void loop() {
       return;
     }
 
-    update_timer(players[active_player].clock);
+    players[active_player].clock->update();
     update_display(&players[active_player]);
   }
 
