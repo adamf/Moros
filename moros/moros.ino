@@ -33,12 +33,12 @@ typedef struct {
 
 button buttons[2] = {
   {
-    interrupt_number: 0,
-    handler: handle_button_press_1
+    .interrupt_number = 0,
+    .handler = handle_button_press_1
   },
   {
-    interrupt_number: 1,
-    handler: handle_button_press_2
+    .interrupt_number = 1,
+    .handler = handle_button_press_2
   }
 };
 
@@ -50,14 +50,14 @@ typedef struct {
 
 screen screens[2] = {
   {
-    cs_pin: 4,
-    dc_pin: 5,
-    rst_pin: 6
+    .cs_pin = 4,
+    .dc_pin = 5,
+    .rst_pin = 6
   },
   {
-    cs_pin: 7,
-    dc_pin: 8,
-    rst_pin: 9
+    .cs_pin = 7,
+    .dc_pin = 8,
+    .rst_pin = 9
   }
 };
 
@@ -73,22 +73,22 @@ typedef struct {
 
 player players[2] = { 
   {
-    INITIAL_TIME_MS,
-    0,
-    TFT(screens[0].cs_pin, screens[0].dc_pin, screens[0].rst_pin),
-    "",
-    0,
-    buttons[0].interrupt_number,
-    buttons[0].handler
+    .time_remaining_ms = INITIAL_TIME_MS,
+    .last_update_ms = 0,
+    .tft = TFT(screens[0].cs_pin, screens[0].dc_pin, screens[0].rst_pin),
+    .display_time = {},
+    .display_width_chars = 0,
+    .interrupt_number = buttons[0].interrupt_number,
+    .handle_button_press = buttons[0].handler
   },
   {
-    INITIAL_TIME_MS,
-    0,
-    TFT(screens[1].cs_pin, screens[1].dc_pin, screens[1].rst_pin),
-    "",
-    0,
-    buttons[1].interrupt_number,
-    buttons[1].handler
+    .time_remaining_ms = INITIAL_TIME_MS,
+    .last_update_ms = 0,
+    .tft = TFT(screens[1].cs_pin, screens[1].dc_pin, screens[1].rst_pin),
+    .display_time = {},
+    .display_width_chars = 0,
+    .interrupt_number = buttons[1].interrupt_number,
+    .handle_button_press = buttons[1].handler
   }
 };
 
