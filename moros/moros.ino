@@ -12,7 +12,7 @@
 #include <SPI.h>
 #include <TFT.h>
 
-#define CLOCK_STOP -1
+#define NONE -1
 
 #define DISPLAY_FONT_SIZE 7
 #define CHAR_HEIGHT_PX DISPLAY_FONT_SIZE * 10
@@ -23,8 +23,8 @@
 #define INITIAL_TIME_MS 5000
 
 
-int active_player = CLOCK_STOP;
-volatile int button_pressed = CLOCK_STOP;
+int active_player = NONE;
+volatile int button_pressed = NONE;
 
 inline void handle_button_press(int button) {
   button_pressed = button;
@@ -104,10 +104,10 @@ void loop() {
     loop_count++;
   }
  // Serial.println(button_pressed);
-  if (active_player != CLOCK_STOP) {
+  if (active_player != NONE) {
     if (players[active_player].time_remaining_ms <= 0) {
-      active_player = CLOCK_STOP;
-      button_pressed = CLOCK_STOP;
+      active_player = NONE;
+      button_pressed = NONE;
       return;
     }
     players[active_player].time_remaining_ms -= (millis() - players[active_player].last_update_ms);
@@ -129,7 +129,7 @@ void loop() {
     }
     strncpy(players[active_player].display_time, timea, sizeof(players[active_player].display_time));
   }
-  if ((active_player == CLOCK_STOP || button_pressed == active_player) && button_pressed != CLOCK_STOP)   {
+  if ((active_player == NONE || button_pressed == active_player) && button_pressed != NONE)   {
     Serial.print("pre button_pressed: ");
     Serial.println(button_pressed);
     Serial.print("pre active_player: ");
