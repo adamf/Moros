@@ -78,34 +78,36 @@ Screen screens[2] = {
 };
 
 typedef struct {
-  long time_remaining_ms;
-  long last_update_ms;
+  unsigned long time_remaining_ms;
+  unsigned long last_update_ms;
+} Clock;
+
+typedef struct {
   char display_time[12];
   int display_width_chars;
+  Clock *clock;
   Button *button;
   Screen *screen;
 } Player;
 
 Player players[2] = { 
   {
-    .time_remaining_ms = INITIAL_TIME_MS,
-    .last_update_ms = 0,
     .display_time = {},
     .display_width_chars = 0,
+    .clock = new Clock,
     .button = &buttons[0],
     .screen = &screens[0]
   },
   {
-    .time_remaining_ms = INITIAL_TIME_MS,
-    .last_update_ms = 0,
     .display_time = {},
     .display_width_chars = 0,
+    .clock = new Clock,
     .button = &buttons[1],
     .screen = &screens[1]
   }
 };
 
-void init_display(Player *p) {
+void init_player(Player *p) {
   Screen *screen = p->screen;
   screen->tft = new TFT(screen->cs_pin, screen->dc_pin, screen->rst_pin);
   screen->tft->begin();
@@ -113,11 +115,19 @@ void init_display(Player *p) {
   screen->tft->stroke(255,255,255);
   screen->tft->fill(0,0,0);
   screen->tft->setTextSize(DISPLAY_FONT_SIZE);
+  Clock *clock = p->clock;
+  clock->time_remaining_ms = INITIAL_TIME_MS;
+  clock->last_update_ms = 0;
 }
 
-void update_timer(Player *p) {
-  p->time_remaining_ms -= (millis() - p->last_update_ms);
-  p->last_update_ms = millis();
+void update_timer(Clock *c) {
+  unsigned long time_since_last_update_ms = millis() - c->last_update_ms;
+  if (c->time_remaining_ms < time_since_last_update_ms) {
+    c->time_remaining_ms = 0;
+  } else {
+    c->time_remaining_ms -= time_since_last_update_ms;
+  }
+  c->last_update_ms = millis();
 }
 
 void update_changed_chars(Player *p, const char *text) {
@@ -141,7 +151,7 @@ void update_changed_chars(Player *p, const char *text) {
 
 void update_display(Player *p) {
   static char timea[12];
-  ltoa(p->time_remaining_ms/100, timea, 10);
+  ltoa(p->clock->time_remaining_ms/100, timea, 10);
   update_changed_chars(p, timea);
 }
 
@@ -149,13 +159,13 @@ void handle_button_press(int button) {
   serprintf("button %d pressed\r\n", button);
   serprintf("before: active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
   active_player = (button_pressed + 1) % 2;
-  players[active_player].last_update_ms = millis();
+  players[active_player].clock->last_update_ms = millis();
   button_pressed = NONE;
   serprintf("after:  active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
 }
 
 int out_of_time(Player *p) {
-  return p->time_remaining_ms <= 0;
+  return p->clock->time_remaining_ms <= 0;
 }
 
 void setup(void) {
@@ -163,7 +173,7 @@ void setup(void) {
   serprintf("Initializing...");
 
   for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
-    init_display(&players[i]);
+    init_player(&players[i]);
     update_display(&players[i]);
     attachInterrupt(players[i].button->interrupt_number, players[i].button->interrupt_handler, RISING);
   }
@@ -181,7 +191,7 @@ void loop() {
       return;
     }
 
-    update_timer(&players[active_player]);
+    update_timer(players[active_player].clock);
     update_display(&players[active_player]);
   }
 
