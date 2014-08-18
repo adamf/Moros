@@ -38,7 +38,6 @@ void handle_button_press_2() {
 typedef struct {
   long time_remaining_ms;
   long last_update_ms;
-  long btn_state;
   TFT tft;
   int button_pin;
   char display_time[12];
@@ -52,7 +51,6 @@ player players[PLAYER_COUNT] = {
   {
     INITIAL_TIME_MS,
     0,
-    0,
     TFT(cs_1, dc_1, rst_1),
     btn_1,
     "",
@@ -62,7 +60,6 @@ player players[PLAYER_COUNT] = {
   },
   {
     INITIAL_TIME_MS,
-    0,
     0,
     TFT(cs_2, dc_2, rst_2),
     btn_2,
