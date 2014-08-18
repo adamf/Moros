@@ -43,7 +43,6 @@ typedef struct {
   long time_remaining_ms;
   long last_update_ms;
   TFT tft;
-  int button_pin;
   char display_time[12];
   int display_width_chars;
   int interrupt_number;
@@ -56,7 +55,6 @@ player players[PLAYER_COUNT] = {
     INITIAL_TIME_MS,
     0,
     TFT(cs_1, dc_1, rst_1),
-    btn_1,
     "",
     0,
     btn_1_interrupt,
@@ -66,7 +64,6 @@ player players[PLAYER_COUNT] = {
     INITIAL_TIME_MS,
     0,
     TFT(cs_2, dc_2, rst_2),
-    btn_2,
     "",
     0,
     btn_2_interrupt,
@@ -93,7 +90,6 @@ void setup(void) {
     ltoa(players[i].time_remaining_ms/100, timea, 10);
     strncpy(players[i].display_time, timea, 12);
     players[i].tft.text(timea, 0, 20);
-//    pinMode(players[i].button_pin, INPUT);
     Serial.println("handle button press:");
     Serial.println((int)players[i].handle_button_press);
     Serial.println(players[i].interrupt_number);
