@@ -178,7 +178,7 @@ public:
         // Unrecognized button interrupt
         serprintf("received interrupt %d, but no player has a button on that interrupt!\r\n", interrupt_fired);
 
-      } else if (player_who_pressed != NONE && (active_player == NONE || player_who_pressed == active_player)) {
+      } else if (active_player == NONE || player_who_pressed == active_player) {
         // either it was nobody's turn, or the active player pressed their button
         // switch to the opposite player from the one whose button was pressed
         active_player = (player_who_pressed+1) % 2;
