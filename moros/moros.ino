@@ -90,11 +90,6 @@ public:
   }
 };
 
-Screen *screens[2] = {
-  new Screen(4,5,6),
-  new Screen(7,8,9)
-};
-
 class Clock {
 public:
   unsigned long time_remaining_ms;
@@ -144,8 +139,14 @@ public:
 };
 
 Player *players[2] = { 
-  new Player(&buttons[0], screens[0]),
-  new Player(&buttons[1], screens[1])
+  new Player(
+    &buttons[0],
+    new Screen(4,5,6)
+  ),
+  new Player(
+    &buttons[1],
+    new Screen(7,8,9)
+  )
 };
 
 void handle_button_press(int button) {
