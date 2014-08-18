@@ -164,8 +164,6 @@ void setup(void) {
   }
 
   serprintf("done.\r\n");
-  //delay(100);
-  //exit(1);
 }
 
 
