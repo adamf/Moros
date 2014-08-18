@@ -172,33 +172,46 @@ public:
       if (players[i]->button->interrupt_number == interrupt_number)
         return i;
     }
-    serprintf("received interrupt %d, but no player has a button on that interrupt!\r\n", interrupt_number);
-    return NULL;
+    return NONE;
   }
 
   void tick() {
     if (interrupt_fired != NONE) {
       // Someone pressed a button since the last time we checked.
-      int player = interrupt_to_player(interrupt_fired);
+      int player_who_pressed = interrupt_to_player(interrupt_fired);
 
-      if (active_player == NONE || player == active_player) {
-        active_player = (player+1) % 2;
+      if (player_who_pressed == NONE) {
+        // Unrecognized button interrupt
+        serprintf("received interrupt %d, but no player has a button on that interrupt!\r\n", interrupt_fired);
+
+      } else if (player_who_pressed != NONE && (active_player == NONE || player_who_pressed == active_player)) {
+        // either it was nobody's turn, or the active player pressed their button
+        // switch to the opposite player from the one whose button was pressed
+        active_player = (player_who_pressed+1) % 2;
         players[active_player]->clock->start();
+
       } else {
-        serprintf("Ignoring button press for player %d\r\n", player);
+        serprintf("Ignoring button press for inactive player %d\r\n", player_who_pressed);
       }
+
       interrupt_fired = NONE;
     }
 
-    if (active_player != NONE) {
-      if (players[active_player]->out_of_time()) {
-        serprintf("Flag fell for player %d\r\n", active_player);
-        active_player = NONE;
-        return;
-      }
+    if (active_player == NONE)
+      // It's nobody's turn, so just keep waiting for a button press
+      return;
 
-      players[active_player]->tick();
+    // It's someone's turn:
+
+    // Check for flag
+    if (players[active_player]->out_of_time()) {
+      serprintf("Flag fell for player %d\r\n", active_player);
+      active_player = NONE;
+      return;
     }
+
+    // Update the clock
+    players[active_player]->tick();
   }
 };
 int Controller::active_player = NONE;
