@@ -16,11 +16,6 @@
 
 #define NONE -1
 
-#define DISPLAY_FONT_SIZE 7
-#define CHAR_HEIGHT_PX DISPLAY_FONT_SIZE * 10
-#define CHAR_WIDTH_PX 42
-#define DISPLAY_WIDTH_CHAR 4
-
 //#define INITIAL_TIME_MS 300000
 #define INITIAL_TIME_MS 5000
 
@@ -51,6 +46,12 @@ void handle_button_interrupt_1() {
 class Screen {
 private:
   char prev_text[12];
+
+#define DISPLAY_FONT_SIZE 7
+#define CHAR_HEIGHT_PX DISPLAY_FONT_SIZE * 10
+#define CHAR_WIDTH_PX 42
+#define DISPLAY_WIDTH_CHAR 4
+
 public:
   TFT *tft;
   Screen(unsigned int cs_pin, unsigned int dc_pin, unsigned int rst_pin) {
