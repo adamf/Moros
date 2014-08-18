@@ -6,9 +6,7 @@
 #define cs_2   7
 #define dc_2   8
 #define rst_2  9
-#define btn_1 2
 #define btn_1_interrupt 0
-#define btn_2 3
 #define btn_2_interrupt 1
 
 #include <SPI.h>
