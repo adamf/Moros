@@ -28,30 +28,30 @@
 int active_player = NONE;
 volatile int button_pressed = NONE;
 
-inline void handle_button_press(int button) {
+inline void handle_button_interrupt(int button) {
   button_pressed = button;
 }
 
-void handle_button_press_0() {
-  handle_button_press(0);
+void handle_button_interrupt_0() {
+  handle_button_interrupt(0);
 }
-void handle_button_press_1() {
-  handle_button_press(1);
+void handle_button_interrupt_1() {
+  handle_button_interrupt(1);
 }
 
 typedef struct {
   unsigned int interrupt_number;
-  void (*handler)();
-} button;
+  void (*interrupt_handler)();
+} Button;
 
-button buttons[2] = {
+Button buttons[2] = {
   {
     .interrupt_number = 0,
-    .handler = handle_button_press_0
+    .interrupt_handler = handle_button_interrupt_0
   },
   {
     .interrupt_number = 1,
-    .handler = handle_button_press_1
+    .interrupt_handler = handle_button_interrupt_1
   }
 };
 
@@ -59,9 +59,9 @@ typedef struct {
   unsigned int cs_pin;
   unsigned int dc_pin;
   unsigned int rst_pin;
-} screen;
+} Screen;
 
-screen screens[2] = {
+Screen screens[2] = {
   {
     .cs_pin = 4,
     .dc_pin = 5,
@@ -80,8 +80,7 @@ typedef struct {
   TFT tft;
   char display_time[12];
   int display_width_chars;
-  unsigned int interrupt_number;
-  void (* handle_button_press)();
+  Button *button;
 } player;
 
 player players[2] = { 
@@ -91,8 +90,7 @@ player players[2] = {
     .tft = TFT(screens[0].cs_pin, screens[0].dc_pin, screens[0].rst_pin),
     .display_time = {},
     .display_width_chars = 0,
-    .interrupt_number = buttons[0].interrupt_number,
-    .handle_button_press = buttons[0].handler
+    .button = &buttons[0]
   },
   {
     .time_remaining_ms = INITIAL_TIME_MS,
@@ -100,8 +98,7 @@ player players[2] = {
     .tft = TFT(screens[1].cs_pin, screens[1].dc_pin, screens[1].rst_pin),
     .display_time = {},
     .display_width_chars = 0,
-    .interrupt_number = buttons[1].interrupt_number,
-    .handle_button_press = buttons[1].handler
+    .button = &buttons[1]
   }
 };
 
@@ -141,6 +138,19 @@ void update_display(player *p) {
   update_changed_chars(p, timea);
 }
 
+void handle_button_press(int button) {
+  serprintf("button %d pressed\r\n", button);
+  serprintf("before: active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
+  active_player = (button_pressed + 1) % 2;
+  players[active_player].last_update_ms = millis();
+  button_pressed = NONE;
+  serprintf("after:  active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
+}
+
+int out_of_time(player *p) {
+  return p->time_remaining_ms <= 0;
+}
+
 // does the SPI library allow selecting of which SS to issue the command on?
 
 void setup(void) {
@@ -150,7 +160,7 @@ void setup(void) {
   for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
     init_display(&players[i]);
     update_display(&players[i]);
-    attachInterrupt(players[i].interrupt_number, players[i].handle_button_press, RISING);
+    attachInterrupt(players[i].button->interrupt_number, players[i].button->interrupt_handler, RISING);
   }
 
   serprintf("done.\r\n");
@@ -161,25 +171,19 @@ void setup(void) {
 
 void loop() {
   if (active_player != NONE) {
-    // Check for flag
-    if (players[active_player].time_remaining_ms <= 0) {
+    if (out_of_time(&players[active_player])) {
+      serprintf("Flag fell for player %d\r\n", active_player);
       active_player = NONE;
       button_pressed = NONE;
       return;
     }
 
-    // Update the active player's timer and display
     update_timer(&players[active_player]);
     update_display(&players[active_player]);
   }
 
   if ((active_player == NONE || button_pressed == active_player) && button_pressed != NONE)   {
-    // handle button press
-    serprintf("before: active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
-    active_player = (button_pressed + 1) % 2;
-    players[active_player].last_update_ms = millis();
-    button_pressed = NONE;
-    serprintf("after:  active_player=%d, button_pressed=%d\r\n", active_player, button_pressed);
+    handle_button_press(button_pressed);
   }     
 
 }
