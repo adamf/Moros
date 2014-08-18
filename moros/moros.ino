@@ -118,7 +118,7 @@ void update_timer(player *p) {
   p->last_update_ms = millis();
 }
 
-void incrementally_update_text(player *p, const char *text) {
+void update_changed_chars(player *p, const char *text) {
   for(unsigned int i = 0; i < strlen(text); i++) {
     p->tft.text(text, 0, 20);
     if(text[i] != p->display_time[i]) {
@@ -138,7 +138,7 @@ void incrementally_update_text(player *p, const char *text) {
 void update_display(player *p) {
   static char timea[12];
   ltoa(p->time_remaining_ms/100, timea, 10);
-  incrementally_update_text(p, timea);
+  update_changed_chars(p, timea);
 }
 
 // does the SPI library allow selecting of which SS to issue the command on?
