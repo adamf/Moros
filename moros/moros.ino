@@ -62,6 +62,7 @@ public:
   TFT *tft;
   Screen(unsigned int cs_pin, unsigned int dc_pin, unsigned int rst_pin) {
     tft = new TFT(cs_pin, dc_pin, rst_pin);
+    prev_text[0] = '\0';
   };
   void init() {
     tft->begin();
