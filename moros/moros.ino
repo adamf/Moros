@@ -28,9 +28,7 @@ public:
     attachInterrupt(interrupt_number, interrupt_handler, RISING);
   };
 
-  static inline void handle_button_interrupt(int button) {
-    button_pressed = button;
-  };
+  static inline void handle_button_interrupt(int button);
 };
 volatile int Button::button_pressed = NONE;
 
@@ -165,6 +163,10 @@ public:
     }
   };
 
+  void handle_button_interrupt(int button) {
+    Button::button_pressed = button;
+  };
+
   void handle_button_press(int button) {
     serprintf("button %d pressed\r\n", button);
     serprintf("before: active_player=%d, button_pressed=%d\r\n", active_player, Button::button_pressed);
@@ -194,6 +196,10 @@ public:
 int Controller::active_player = NONE;
 
 Controller controller;
+
+void Button::handle_button_interrupt(int button) {
+  controller.handle_button_interrupt(button);
+};
 
 void setup(void) {
   Serial.begin(115200);
