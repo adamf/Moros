@@ -151,8 +151,6 @@ int out_of_time(player *p) {
   return p->time_remaining_ms <= 0;
 }
 
-// does the SPI library allow selecting of which SS to issue the command on?
-
 void setup(void) {
   Serial.begin(115200);
   serprintf("Initializing...");
