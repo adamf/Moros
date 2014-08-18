@@ -159,13 +159,7 @@ void setup(void) {
 }
 
 
-int loop_count = 0;
 void loop() {
-  if (loop_count == 0) {
-    serprintf("in loop\r\n");
-    loop_count++;
-  }
-
   if (active_player != NONE) {
     // Check for flag
     if (players[active_player].time_remaining_ms <= 0) {
