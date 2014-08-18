@@ -143,7 +143,7 @@ public:
     );
     players[1] = new Player(
      new Button(1, handle_interrupt_1),
-      new Screen(7,8,9)
+     new Screen(7,8,9)
     );
 
   }
