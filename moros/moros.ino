@@ -12,12 +12,14 @@
 
 #include <SPI.h>
 #include <TFT.h>
+#include "U8glib.h"
+
 #include "printf.h"
 
 #define NONE -1
 
-//#define INITIAL_TIME_MS 300000
-#define INITIAL_TIME_MS 5000
+#define INITIAL_TIME_MS 300000
+//#define INITIAL_TIME_MS 5000
 
 
 class Button {
@@ -29,22 +31,52 @@ public:
   };
 };
 
+
 class Screen {
+public:
+ virtual void init(unsigned int cs_pin, unsigned int dc_pin, unsigned int rst_pin) {serprintf("asdfasdf\n");};
+ virtual void display_text(const char *text) {};
+
+};
+
+class OLED_Screen : public Screen {
+private:
+  char prev_text[12];
+  const int CHAR_WIDTH_PX = 25;
+public:
+  U8GLIB_SSD1351_128X128GH_HICOLOR *oled;
+  void init(unsigned int cs_pin, unsigned int dc_pin, unsigned int rst_pin) {
+    oled = new U8GLIB_SSD1351_128X128GH_HICOLOR(cs_pin, dc_pin, rst_pin);
+    oled->setHiColorByRGB(255,255,255);
+    oled->setFont(u8g_font_osb26r);
+    prev_text[0] = '\0';  
+    serprintf("New OLED...");
+  };
+
+  void display_text(const char *text) {
+     // picture loop
+    oled->firstPage();  
+    do {
+      oled->drawStr(0, 60, text);
+    } while(oled->nextPage());   
+    strncpy(prev_text, text, sizeof(prev_text));    
+  }
+};
+
+class TFT_Screen : public Screen {
 private:
   char prev_text[12];
 
 #define DISPLAY_FONT_SIZE 7
 #define CHAR_HEIGHT_PX DISPLAY_FONT_SIZE * 10
-#define CHAR_WIDTH_PX 42
+  const int CHAR_WIDTH_PX = 42;
 #define DISPLAY_WIDTH_CHAR 4
 
 public:
   TFT *tft;
-  Screen(unsigned int cs_pin, unsigned int dc_pin, unsigned int rst_pin) {
+  void init(unsigned int cs_pin, unsigned int dc_pin, unsigned int rst_pin) {
     tft = new TFT(cs_pin, dc_pin, rst_pin);
-    prev_text[0] = '\0';
-  };
-  void init() {
+    prev_text[0] = '\0';   
     tft->begin();
     tft->background(0,0,0);
     tft->stroke(255,255,255);
@@ -70,6 +102,7 @@ public:
   }
 };
 
+
 class Clock {
 public:
   unsigned long time_remaining_ms;
@@ -92,6 +125,16 @@ public:
     }
     last_update_ms = millis();
   };
+
+  char *human_time_remaining() {
+    char text[8];
+    int minutes_left = time_remaining_ms / 1000 / 60;
+    int seconds_left = (time_remaining_ms - (minutes_left * 60000)) / 1000;
+    int tenths_left = (time_remaining_ms - ((minutes_left * 60000) + (seconds_left * 1000))) / 100;
+    serprintf("min %d sec %d tenths %d\n", minutes_left, seconds_left, tenths_left);
+    snprintf(text, sizeof(text), "%02d:%02d.%d", minutes_left, seconds_left, tenths_left);
+    return text;
+  }  
 };
 
 class Player {
@@ -107,13 +150,13 @@ public:
   };
 
   void init() {
-    screen->init();
   };
 
   void update_display() {
     static char timea[12];
     ltoa(clock->time_remaining_ms/100, timea, 10);
-    screen->display_text(timea);
+    //screen->display_text(timea);
+    screen->display_text(clock->human_time_remaining());
   };
 
   void tick() {
@@ -137,18 +180,24 @@ public:
   volatile static int interrupt_fired;
 
   Controller() {
-    players[0] = new Player(
-     new Button(0, handle_interrupt_0),
-     new Screen(4,5,6)
-    );
-    players[1] = new Player(
-     new Button(1, handle_interrupt_1),
-      new Screen(7,8,9)
-    );
 
   }
 
   void init() {
+    Screen *s1;
+    s1 = new OLED_Screen();
+    s1->init(5,2,3);
+    Screen *s2;
+    s2 = new OLED_Screen();
+    s2->init(7,6,8);
+    players[0] = new Player(
+     new Button(0, handle_interrupt_0),
+     s1
+    );
+    players[1] = new Player(
+     new Button(1, handle_interrupt_1),
+      s2
+    );    
     for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
       players[i]->init();
       players[i]->clock->start();
