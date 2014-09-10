@@ -131,7 +131,7 @@ public:
     int minutes_left = time_remaining_ms / 1000 / 60;
     int seconds_left = (time_remaining_ms - (minutes_left * 60000)) / 1000;
     int tenths_left = (time_remaining_ms - ((minutes_left * 60000) + (seconds_left * 1000))) / 100;
-    serprintf("min %d sec %d tenths %d\n", minutes_left, seconds_left, tenths_left);
+    //serprintf("min %d sec %d tenths %d\n", minutes_left, seconds_left, tenths_left);
     snprintf(text, sizeof(text), "%02d:%02d.%d", minutes_left, seconds_left, tenths_left);
     return text;
   }  
@@ -186,7 +186,7 @@ public:
   void init() {
     Screen *s1;
     s1 = new OLED_Screen();
-    s1->init(5,2,3);
+    s1->init(5,9,10);
     Screen *s2;
     s2 = new OLED_Screen();
     s2->init(7,6,8);
