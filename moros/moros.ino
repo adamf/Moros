@@ -29,41 +29,69 @@ public:
   };
 };
 
+struct Font {
+  unsigned int font_size;
+  unsigned int char_height_px;
+  unsigned int char_width_px;
+};
+
+Font fonts[4] = {
+  {
+    .font_size = 7,
+    .char_height_px = 48,
+    .char_width_px = 36
+  },
+  {
+    .font_size = 6,
+    .char_height_px = 42,
+    .char_width_px = 30
+  },
+  {
+    .font_size = 5,
+    .char_height_px = 36,
+    .char_width_px = 24
+  },
+  {
+    .font_size = 4,
+    .char_height_px = 30,
+    .char_width_px = 20
+  }
+};
+#define FONT 3
+
 class Screen {
 private:
   char prev_text[12];
-
-#define DISPLAY_FONT_SIZE 7
-#define CHAR_HEIGHT_PX DISPLAY_FONT_SIZE * 10
-#define CHAR_WIDTH_PX 42
-#define DISPLAY_WIDTH_CHAR 4
 
 public:
   TFT *tft;
   Screen(unsigned int cs_pin, unsigned int dc_pin, unsigned int rst_pin) {
     tft = new TFT(cs_pin, dc_pin, rst_pin);
-    prev_text[0] = '\0';
+    memset(prev_text, 0, sizeof(prev_text));
   };
   void init() {
     tft->begin();
     tft->background(0,0,0);
     tft->stroke(255,255,255);
     tft->fill(0,0,0);
-    tft->setTextSize(DISPLAY_FONT_SIZE);
+    tft->setTextSize(fonts[FONT].font_size);
   };
 
   void display_text(const char *text) {
     for(unsigned int i = 0; i < strlen(text); i++) {
-      if(text[i] != prev_text[i]) {
+      serprintf("Considering displaying character: %c\r\n", text[i]);
+      if(prev_text[0] == '\0' || text[i] != prev_text[i]) {
+        serprintf("Previous character was: %c\r\n", prev_text[i]);
 
         // erase this character cell
+        // tft->stroke(255,0,0); // draw bounding box
         tft->stroke(0,0,0);
-        tft->rect(CHAR_WIDTH_PX * i , 20, CHAR_WIDTH_PX, CHAR_HEIGHT_PX);
+        tft->rect(fonts[FONT].char_width_px * i, 20, fonts[FONT].char_width_px, fonts[FONT].char_height_px);
 
         // print the new character
         char next_char[2] = {text[i], '\0' };
         tft->stroke(255,255,255);
-        tft->text(next_char, CHAR_WIDTH_PX * i, 20);
+        tft->text(next_char, i * fonts[FONT].char_width_px, 20);
       }
     }
     strncpy(prev_text, text, sizeof(prev_text));
@@ -92,6 +120,18 @@ public:
     }
     last_update_ms = millis();
   };
+
+  char *human_time_remaining() {
+    static char text[8];
+    unsigned int minutes_left = time_remaining_ms / 1000 / 60;
+    unsigned int seconds_left = (time_remaining_ms - (minutes_left * 60000)) / 1000;
+    unsigned int tenths_left = (time_remaining_ms - ((minutes_left * 60000) + (seconds_left * 1000))) / 100;
+    //serprintf("min %d sec %d tenths %d\r\n", minutes_left, seconds_left, tenths_left);
+    snprintf(text, sizeof(text), "%02d:%02d.%d", minutes_left, seconds_left, tenths_left);
+    //serprintf("%s\r\n", text);
+    return text;
+  }
+
 };
 
 class Player {
@@ -111,9 +151,13 @@ public:
   };
 
   void update_display() {
-    static char timea[12];
-    ltoa(clock->time_remaining_ms/100, timea, 10);
-    screen->display_text(timea);
+    //static char timea[12];
+    //ltoa(clock->time_remaining_ms/100, timea, 10);
+    screen->display_text(clock->human_time_remaining());
+  };
+
+  void display_test_pattern() {
+    screen->display_text("45:01.5");
   };
 
   void tick() {
@@ -153,6 +197,7 @@ public:
       players[i]->init();
       players[i]->clock->start();
       players[i]->update_display();
+      //players[i]->display_test_pattern();
     }
   };
 
