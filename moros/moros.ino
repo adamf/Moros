@@ -128,10 +128,10 @@ public:
 
   char *human_time_remaining() {
     char text[8];
-    int minutes_left = time_remaining_ms / 1000 / 60;
-    int seconds_left = (time_remaining_ms - (minutes_left * 60000)) / 1000;
-    int tenths_left = (time_remaining_ms - ((minutes_left * 60000) + (seconds_left * 1000))) / 100;
-    //serprintf("min %d sec %d tenths %d\n", minutes_left, seconds_left, tenths_left);
+    unsigned int minutes_left = time_remaining_ms / 1000 / 60;
+    unsigned int seconds_left = (time_remaining_ms - (minutes_left * 60000)) / 1000;
+    unsigned int tenths_left = (time_remaining_ms - ((minutes_left * 60000) + (seconds_left * 1000))) / 100;
+    //serprintf("min %d sec %d tenths %d\r\n", minutes_left, seconds_left, tenths_left);
     snprintf(text, sizeof(text), "%02d:%02d.%d", minutes_left, seconds_left, tenths_left);
     return text;
   }  
