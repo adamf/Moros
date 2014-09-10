@@ -54,7 +54,7 @@ Font fonts[4] = {
   {
     .font_size = 4,
     .char_height_px = 30,
-    .char_width_px = 20
+    .char_width_px = 22
   }
 };
 #define FONT 3
@@ -79,9 +79,9 @@ public:
 
   void display_text(const char *text) {
     for(unsigned int i = 0; i < strlen(text); i++) {
-      serprintf("Considering displaying character: %c\r\n", text[i]);
+      // serprintf("Considering displaying character: %c\r\n", text[i]);
       if(prev_text[0] == '\0' || text[i] != prev_text[i]) {
-        serprintf("Previous character was: %c\r\n", prev_text[i]);
+        // serprintf("Previous character was: %c\r\n", prev_text[i]);
 
         // erase this character cell
         // tft->stroke(255,0,0); // draw bounding box
