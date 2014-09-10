@@ -170,9 +170,10 @@ public:
     //static char timea[12];
     //ltoa(clock->time_remaining_ms/100, timea, 10);
     screen->display_text(clock->human_time_remaining());
-    if (clock->flag()) {
-      screen->display_flag();
-    }
+  };
+
+  void flag() {
+    screen->display_flag();
   };
 
   void display_test_pattern() {
@@ -264,6 +265,7 @@ public:
     // Check for flag
     if (players[active_player]->out_of_time()) {
       serprintf("Flag fell for player %d\r\n", active_player);
+      players[active_player]->flag();
       active_player = NONE;
       return;
     }
