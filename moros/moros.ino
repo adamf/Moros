@@ -62,6 +62,9 @@ Font fonts[4] = {
 class Screen {
 private:
   char prev_text[12];
+  const unsigned margin_top = 20;
+  const unsigned margin_left = 2;
+  const unsigned margin_middle = 10;
 
 public:
   TFT *tft;
@@ -84,17 +87,26 @@ public:
         // serprintf("Previous character was: %c\r\n", prev_text[i]);
 
         // erase this character cell
+        tft->fill(0,0,0);
         // tft->stroke(255,0,0); // draw bounding box
         tft->stroke(0,0,0);
-        tft->rect(fonts[FONT].char_width_px * i, 20, fonts[FONT].char_width_px, fonts[FONT].char_height_px);
+        tft->rect(margin_left + fonts[FONT].char_width_px * i, 20,
+                  fonts[FONT].char_width_px, fonts[FONT].char_height_px);
 
         // print the new character
         char next_char[2] = {text[i], '\0' };
         tft->stroke(255,255,255);
-        tft->text(next_char, i * fonts[FONT].char_width_px, 20);
+        tft->text(next_char, margin_left + i * fonts[FONT].char_width_px, margin_top);
       }
     }
     strncpy(prev_text, text, sizeof(prev_text));
+  }
+
+  void display_flag() {
+    tft->stroke(0,0,255);
+    tft->fill(0,0,255);
+    tft->rect(margin_left, margin_top + fonts[FONT].char_height_px + margin_middle,
+              tft->width() * 2 / 3, fonts[FONT].char_height_px);
   }
 };
 
@@ -119,6 +131,10 @@ public:
       time_remaining_ms -= time_since_last_update_ms;
     }
     last_update_ms = millis();
+  };
+
+  bool flag() {
+    return time_remaining_ms == 0;
   };
 
   char *human_time_remaining() {
@@ -154,6 +170,9 @@ public:
     //static char timea[12];
     //ltoa(clock->time_remaining_ms/100, timea, 10);
     screen->display_text(clock->human_time_remaining());
+    if (clock->flag()) {
+      screen->display_flag();
+    }
   };
 
   void display_test_pattern() {
