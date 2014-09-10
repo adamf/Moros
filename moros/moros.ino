@@ -245,9 +245,15 @@ public:
 
       } else if (active_player == NONE || player_who_pressed == active_player) {
         // either it was nobody's turn, or the active player pressed their button
-        // switch to the opposite player from the one whose button was pressed
-        active_player = (player_who_pressed+1) % 2;
-        players[active_player]->clock->start();
+
+        if (players[player_who_pressed]->out_of_time()) {
+          // the other player is already out of time, so ignore
+          active_player = NONE;
+        } else {
+          // switch to the opposite player from the one whose button was pressed
+          active_player = (player_who_pressed+1) % 2;
+          players[active_player]->clock->start();
+        }
 
       } else {
         serprintf("Ignoring button press for inactive player %d\r\n", player_who_pressed);
