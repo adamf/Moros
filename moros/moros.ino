@@ -1,11 +1,10 @@
 /* 
 * TODO:
-* case
-* flag - P0 BLOCKER S0
-* -- have graphical representation of flag
-* wiring diagram - P2 S3
 * reset button (chronos style?) - P1
 * time setting - P1
+* case - P1
+* wiring diagram - P2 S3
+* have graphical representation of flag P3
 * OLEDs
 * 
 */
