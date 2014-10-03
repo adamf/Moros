@@ -12,6 +12,7 @@
 
 #include <SPI.h>
 #include <TFT.h>
+#include <avr/sleep.h>
 #include "moros_tft.h"
 #include "printf.h"
 
@@ -203,11 +204,21 @@ public:
   }
 
   void power_off() {
-    //serprintf("Power off\r\n");
+    serprintf("Power off\r\n");
+    delay(10);
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+    cli();
+    sleep_enable();
+    //sleep_bod_disable();
+    //sei();
+    sleep_mode();
+    /* wake up here */
+    // sleep_disable();
   }
 
   void reset() {
     if (game_state == PRE_GAME) return;
+    serprintf("Reset\r\n");
 
     for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
       players[i]->clock->init();
@@ -216,7 +227,6 @@ public:
     }
     active_player = NONE;
     game_state = PRE_GAME;
-    serprintf("Reset\r\n");
   }
 
   void tick() {
