@@ -30,6 +30,47 @@ public:
   };
 };
 
+class PollButton {
+private:
+  bool pressed;
+  unsigned long pressed_at;
+public:
+  unsigned pin_number;
+  PollButton(unsigned pin_number_):
+    pressed(false),
+    pressed_at(0),
+    pin_number(pin_number_) {
+    pinMode(pin_number, INPUT);
+  };
+
+  // returns the number of ms for which the button has been held down
+  unsigned long poll() {
+    int pin_status = digitalRead(pin_number);
+    // serprintf("PollButton::poll: status is %d (%s)\r\n", pin_status, pin_status == HIGH ? "high" : "not high");
+
+    if (pin_status == HIGH) {
+      if (!pressed) {
+        pressed_at = millis();
+        pressed = true;
+        serprintf("PollButton::poll: pressed\r\n");
+      }
+
+      //serprintf("pressed_at=%lu, millis=%lu\r\n", pressed_at, millis());
+      return millis()-pressed_at;
+    } else if (pin_status == LOW) {
+      if (pressed)
+        serprintf("PollButton::poll: released\r\n");
+      pressed = false;
+      pressed_at = 0;
+    } else {
+      // ???
+      serprintf("PollButton::poll: unrecognized return value from digitalRead: %d\r\n", pin_status);
+    }
+
+    return 0;
+  }
+};
+
 class Clock {
 public:
   unsigned long time_remaining_ms;
@@ -115,8 +156,12 @@ void handle_interrupt_0();
 void handle_interrupt_1();
 
 class Controller {
+protected:
+  const unsigned long reset_button_reset_ms = 3000;
+  const unsigned long reset_button_poweroff_ms = 5000;
 public:
   Player *players[2];
+  PollButton *reset_button;
   static int active_player;
   volatile static int interrupt_fired;
 
@@ -129,7 +174,7 @@ public:
      new Button(1, handle_interrupt_1),
      new Screen(7,8,9)
     );
-
+    reset_button = new PollButton(A0);
   }
 
   void init() {
@@ -152,6 +197,14 @@ public:
         return i;
     }
     return NONE;
+  }
+
+  void power_off() {
+    serprintf("Power off\r\n");
+  }
+
+  void reset() {
+    serprintf("Reset\r\n");
   }
 
   void tick() {
@@ -180,6 +233,15 @@ public:
       }
 
       interrupt_fired = NONE;
+    }
+
+    unsigned long reset_button_held = reset_button->poll();
+    //if (reset_button_held > 0)
+    //  serprintf("reset button was held for %d\r\n", reset_button_held);
+    if (reset_button_held > reset_button_poweroff_ms) {
+      power_off();
+    } else if (reset_button_held > reset_button_reset_ms) {
+      reset();
     }
 
     if (active_player == NONE)
