@@ -4,6 +4,7 @@
 * time setting - P1
 * case - P1
 * wiring diagram - P2 S3
+* pause - P2
 * have graphical representation of flag P3
 * OLEDs
 * 
@@ -74,10 +75,12 @@ class Clock {
 public:
   unsigned long time_remaining_ms;
   unsigned long last_update_ms;
-  Clock() {
+  Clock() { init(); };
+
+  void init() {
     time_remaining_ms = INITIAL_TIME_MS;
     last_update_ms = 0;
-  };
+  }
 
   void start() {
     last_update_ms = millis();
@@ -158,6 +161,7 @@ class Controller {
 protected:
   const unsigned long reset_button_reset_ms = 3000;
   const unsigned long reset_button_poweroff_ms = 5000;
+  enum { INIT, PRE_GAME, IN_PROGRESS, PAUSED } game_state;
 public:
   Player *players[2];
   PollButton *reset_button;
@@ -174,15 +178,15 @@ public:
      new Screen(7,8,9)
     );
     reset_button = new PollButton(A0);
+    game_state = INIT;
   }
 
   void init() {
     for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
       players[i]->init();
-      players[i]->clock->start();
-      players[i]->update_display();
       //players[i]->display_test_pattern();
     }
+    reset();
   };
 
   // called from the actual interrupt handler. be quick.
@@ -199,10 +203,19 @@ public:
   }
 
   void power_off() {
-    serprintf("Power off\r\n");
+    //serprintf("Power off\r\n");
   }
 
   void reset() {
+    if (game_state == PRE_GAME) return;
+
+    for(unsigned int i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
+      players[i]->clock->init();
+      players[i]->screen->reset();
+      players[i]->update_display();
+    }
+    active_player = NONE;
+    game_state = PRE_GAME;
     serprintf("Reset\r\n");
   }
 
@@ -224,6 +237,7 @@ public:
         } else {
           // switch to the opposite player from the one whose button was pressed
           active_player = (player_who_pressed+1) % 2;
+          game_state = IN_PROGRESS;
           players[active_player]->clock->start();
         }
 
@@ -277,7 +291,7 @@ void handle_interrupt_1() {
 
 void setup(void) {
   Serial.begin(115200);
-  serprintf("Initializing...");
+  serprintf("Initializing...\r\n");
 
   controller.init();
 

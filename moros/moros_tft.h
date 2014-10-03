@@ -42,11 +42,10 @@ public:
   TFT *tft;
   Screen(unsigned int cs_pin, unsigned int dc_pin, unsigned int rst_pin) {
     tft = new TFT(cs_pin, dc_pin, rst_pin);
-    memset(prev_text, 0, sizeof(prev_text));
   };
   void init() {
     tft->begin();
-    tft->background(0,0,0);
+    reset();
     tft->stroke(255,255,255);
     tft->fill(0,0,0);
     tft->setTextSize(fonts[FONT].font_size);
@@ -79,6 +78,11 @@ public:
     tft->fill(0,0,255);
     tft->rect(margin_left, margin_top + fonts[FONT].char_height_px + margin_middle,
               tft->width() * 2 / 3, fonts[FONT].char_height_px);
+  }
+
+  void reset() {
+    tft->background(0,0,0);
+    memset(prev_text, 0, sizeof(prev_text));
   }
 };
 
