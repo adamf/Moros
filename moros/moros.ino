@@ -11,14 +11,16 @@
 */
 
 #include <SPI.h>
-#include <TFT.h>
-#include "moros_tft.h"
+#include <SD.h>
+//#include <TFT.h>
+#include <FTOLED.h>
+#include "moros_oled.h"
 #include "printf.h"
 
 #define NONE -1
 
 //#define INITIAL_TIME_MS 300000
-#define INITIAL_TIME_MS 5000
+#define INITIAL_TIME_MS 25000
 
 
 class Button {
@@ -171,11 +173,11 @@ public:
   Controller() {
     players[0] = new Player(
      new Button(0, handle_interrupt_0),
-     new Screen(4,5,6)
+     new Screen(5,9,10)
     );
     players[1] = new Player(
      new Button(1, handle_interrupt_1),
-     new Screen(7,8,9)
+     new Screen(7,6,8)
     );
     reset_button = new PollButton(A0);
     game_state = INIT;
