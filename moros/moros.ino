@@ -73,11 +73,48 @@ public:
   }
 };
 
+class HumanTime {
+public:
+   char hours[2];
+   char minutes[3];
+   char seconds[3];
+   char tenths[2];
+
+  HumanTime() {
+    set_hours(0);
+    set_minutes(0);
+    set_seconds(0);
+    set_tenths(0);
+    serprintf("new time\r\n");
+  };
+
+  void set_hours(unsigned int _hours) {
+    serprintf("%d\r\n", _hours);
+    snprintf(hours, sizeof(hours), "%01d", _hours);
+  };
+  void set_minutes(unsigned int _minutes) {
+    serprintf("%d\r\n", _minutes);
+    snprintf(minutes, sizeof(minutes), "%02d", _minutes);
+  };
+  void set_seconds(unsigned int _seconds) {
+    snprintf(seconds, sizeof(seconds), "%02d", _seconds);
+    serprintf("%s\r\n", seconds);
+  };
+  void set_tenths(unsigned int _tenths) {
+    snprintf(tenths, sizeof(tenths), "%01d", _tenths);
+  }; 
+};
+
 class Clock {
+private:
+  //HumanTime *h_time;
 public:
   unsigned long time_remaining_ms;
   unsigned long last_update_ms;
-  Clock() { init(); };
+  Clock() { 
+//    h_time = new HumanTime();
+    init(); 
+  };
 
   void init() {
     time_remaining_ms = INITIAL_TIME_MS;
@@ -104,11 +141,24 @@ public:
 
   char *human_time_remaining() {
     static char text[8];
+    // TODO(adamf) implement hours left correctly so we can play long games.
+    unsigned int hours_left = time_remaining_ms / 1000 / 60 / 60;
+    if (hours_left < 1) {
+        hours_left = 0; 
+    }
+
+    // Minutes left is wrong, as it doesn't take into account hours left. 
     unsigned int minutes_left = time_remaining_ms / 1000 / 60;
     unsigned int seconds_left = (time_remaining_ms - (minutes_left * 60000)) / 1000;
     unsigned int tenths_left = (time_remaining_ms - ((minutes_left * 60000) + (seconds_left * 1000))) / 100;
     //serprintf("min %d sec %d tenths %d\r\n", minutes_left, seconds_left, tenths_left);
-    snprintf(text, sizeof(text), "%02d:%02d.%d", minutes_left, seconds_left, tenths_left);
+    snprintf(text, sizeof(text), "%02d:%02d", minutes_left, seconds_left);
+
+    //h_time->set_hours(hours_left);
+    //h_time->set_minutes(minutes_left);
+    //h_time->set_minutes(minutes_left);
+    //h_time->set_tenths(tenths_left);
+    //serprintf("hours %s min %s sec %s tenths %s\r\n", h_time->hours, h_time->minutes, h_time->seconds, h_time->tenths);
     //serprintf("%s\r\n", text);
     return text;
   }
@@ -134,7 +184,16 @@ public:
   void update_display() {
     //static char timea[12];
     //ltoa(clock->time_remaining_ms/100, timea, 10);
+    char main_clock_text[6];
+    char secondary_clock_text[3];
+  //  HumanTime *h_time = clock->human_time_remaining();
+  //  HumanTime *h_time = clock->human_time_remaining();
+ //   snprintf(main_clock_text, sizeof(main_clock_text), "%s:%s", h_time->minutes, h_time->seconds);
+ //   serprintf("%s - %s - %s", main_clock_text, h_time->minutes, h_time->seconds);
+//    snprintf(secondary_clock_text, sizeof(secondary_clock_text), ".%s", h_time->tenths);
+//    screen->display_text(main_clock_text);
     screen->display_text(clock->human_time_remaining());
+//    screen->display_secondary_text(secondary_clock_text);
   };
 
   void flag() {
