@@ -1,0 +1,52 @@
+Cmp-Mod V01 Created by Cvpcb 0.201412191901+5326~19~ubuntu14.04.1-product   date = Sun 21 Dec 2014 02:58:59 PM PST
+
+BeginCmp
+TimeStamp = /5494E034;
+Reference = HDR_BUTTONS_MCU1;
+ValeurCmp = MOROS_BUTTONS;
+IdModule  = ab2_header:AB2_HDR_F06-1V;
+EndCmp
+
+BeginCmp
+TimeStamp = /5494DF76;
+Reference = HDR_OLED1;
+ValeurCmp = MOROS_OLED_HDR;
+IdModule  = ab2_idc:AB2_HDR_M05-2V-S;
+EndCmp
+
+BeginCmp
+TimeStamp = /5494DF85;
+Reference = HDR_OLED2;
+ValeurCmp = MOROS_OLED_HDR;
+IdModule  = ab2_idc:AB2_HDR_M05-2V-S;
+EndCmp
+
+BeginCmp
+TimeStamp = /5494D85F;
+Reference = R1;
+ValeurCmp = 10k;
+IdModule  = Discret:R1;
+EndCmp
+
+BeginCmp
+TimeStamp = /5494D86E;
+Reference = R2;
+ValeurCmp = 10k;
+IdModule  = Discret:R1;
+EndCmp
+
+BeginCmp
+TimeStamp = /54950939;
+Reference = R3;
+ValeurCmp = 10k;
+IdModule  = Discret:R1;
+EndCmp
+
+BeginCmp
+TimeStamp = /54968518;
+Reference = U1;
+ValeurCmp = ARDUINO_MICRO_SHIELD;
+IdModule  = micro:ARDUINO_MICRO_SHIELD;
+EndCmp
+
+EndListe

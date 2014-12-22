@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>/home/adamf/src/Moros/shield/moros.sch</source>
+    <date>Sun 21 Dec 2014 02:11:00 PM PST</date>
+    <tool>Eeschema 0.201412191901+5326~19~ubuntu14.04.1-product</tool>
+  </design>
+  <components>
+    <comp ref="R1">
+      <value>10k</value>
+      <footprint>Discret:R1</footprint>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5494D85F</tstamp>
+    </comp>
+    <comp ref="R2">
+      <value>10k</value>
+      <footprint>Discret:R1</footprint>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5494D86E</tstamp>
+    </comp>
+    <comp ref="HDR_OLED1">
+      <value>MOROS_OLED_HDR</value>
+      <footprint>ab2_idc:AB2_HDR_M05-2V-S</footprint>
+      <libsource lib="moros" part="MOROS_OLED_HDR"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5494DF76</tstamp>
+    </comp>
+    <comp ref="HDR_OLED2">
+      <value>MOROS_OLED_HDR</value>
+      <footprint>ab2_idc:AB2_HDR_M05-2V-S</footprint>
+      <libsource lib="moros" part="MOROS_OLED_HDR"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5494DF85</tstamp>
+    </comp>
+    <comp ref="HDR_BUTTONS_MCU1">
+      <value>MOROS_BUTTONS</value>
+      <footprint>ab2_header:AB2_HDR_M06-1V</footprint>
+      <libsource lib="moros" part="MOROS_BUTTONS"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5494E034</tstamp>
+    </comp>
+    <comp ref="R3">
+      <value>10k</value>
+      <footprint>Discret:R1</footprint>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>54950939</tstamp>
+    </comp>
+    <comp ref="U1">
+      <value>ARDUINO_MICRO_SHIELD</value>
+      <footprint>micro:ARDUINO_MICRO_SHIELD</footprint>
+      <libsource lib="arduino_micro_shield" part="ARDUINO_MICRO_SHIELD"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>54968518</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="moros" part="MOROS_OLED_HDR">
+      <fields>
+        <field name="Reference">HDR</field>
+        <field name="Value">MOROS_OLED_HDR</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VCC" type="passive"/>
+        <pin num="2" name="GND" type="passive"/>
+        <pin num="3" name="~" type="NotConnected"/>
+        <pin num="4" name="~" type="NotConnected"/>
+        <pin num="5" name="~" type="NotConnected"/>
+        <pin num="6" name="MOSI" type="passive"/>
+        <pin num="7" name="SCK" type="passive"/>
+        <pin num="8" name="OLED_CS" type="passive"/>
+        <pin num="9" name="OLED_DC" type="passive"/>
+        <pin num="10" name="OLED_RST" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="arduino_micro_shield" part="ARDUINO_MICRO_SHIELD">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">ARDUINO_UNO_SHIELD</field>
+      </fields>
+      <pins>
+        <pin num="1" name="MOSI" type="input"/>
+        <pin num="2" name="RX_LED/SS" type="input"/>
+        <pin num="3" name="1/TX" type="input"/>
+        <pin num="4" name="0/RX" type="input"/>
+        <pin num="5" name="RESET" type="input"/>
+        <pin num="6" name="GND" type="power_out"/>
+        <pin num="7" name="2/SDA" type="input"/>
+        <pin num="8" name="3(PWM)/SCL" type="input"/>
+        <pin num="9" name="4/A6" type="input"/>
+        <pin num="10" name="5(PWM)" type="power_out"/>
+        <pin num="11" name="6(PWM)/A7" type="input"/>
+        <pin num="12" name="7" type="input"/>
+        <pin num="13" name="8/A8" type="input"/>
+        <pin num="14" name="9(PWM)/A9" type="input"/>
+        <pin num="15" name="10(PWM)/A10" type="input"/>
+        <pin num="16" name="11(PWM)" type="input"/>
+        <pin num="17" name="12/A11" type="input"/>
+        <pin num="18" name="13(PWM)" type="input"/>
+        <pin num="19" name="3.3V" type="power_in"/>
+        <pin num="20" name="AREF" type="power_in"/>
+        <pin num="21" name="A0" type="input"/>
+        <pin num="22" name="A1" type="input"/>
+        <pin num="23" name="A2" type="input"/>
+        <pin num="24" name="A3" type="input"/>
+        <pin num="25" name="A4" type="input"/>
+        <pin num="26" name="A5" type="input"/>
+        <pin num="27" name="~" type="NotConnected"/>
+        <pin num="28" name="~" type="NotConnected"/>
+        <pin num="29" name="+5V" type="power_in"/>
+        <pin num="30" name="RESET" type="input"/>
+        <pin num="31" name="GND" type="power_out"/>
+        <pin num="32" name="VIN" type="power_in"/>
+        <pin num="33" name="MISO" type="input"/>
+        <pin num="34" name="SCK" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="R">
+      <description>Resistance</description>
+      <footprints>
+        <fp>R?</fp>
+        <fp>SM0603</fp>
+        <fp>SM0805</fp>
+        <fp>R?-*</fp>
+        <fp>SM1206</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="moros" part="MOROS_BUTTONS">
+      <fields>
+        <field name="Reference">HDR</field>
+        <field name="Value">MOROS_BUTTONS</field>
+      </fields>
+      <pins>
+        <pin num="1" name="PLR1" type="input"/>
+        <pin num="2" name="PLR2" type="input"/>
+        <pin num="3" name="RST" type="passive"/>
+        <pin num="4" name="~" type="passive"/>
+        <pin num="5" name="~" type="passive"/>
+        <pin num="6" name="~" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="device">
+      <uri>/usr/share/kicad/library/device.lib</uri>
+    </library>
+    <library logical="moros">
+      <uri>/home/adamf/src/Moros/shield/moros.lib</uri>
+    </library>
+    <library logical="arduino_micro_shield">
+      <uri>/home/adamf/src/Moros/shield/arduino_micro_shield.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="/ToCS1">
+      <node ref="U1" pin="10"/>
+      <node ref="HDR_OLED1" pin="8"/>
+    </net>
+    <net code="2" name="/ToRST1">
+      <node ref="U1" pin="12"/>
+      <node ref="HDR_OLED1" pin="10"/>
+    </net>
+    <net code="3" name="/ToDC1">
+      <node ref="HDR_OLED1" pin="9"/>
+      <node ref="U1" pin="11"/>
+    </net>
+    <net code="4" name="/ToSCK">
+      <node ref="U1" pin="34"/>
+      <node ref="HDR_OLED1" pin="7"/>
+      <node ref="HDR_OLED2" pin="7"/>
+    </net>
+    <net code="5" name="Net-(U1-Pad2)">
+      <node ref="U1" pin="2"/>
+    </net>
+    <net code="6" name="Net-(U1-Pad3)">
+      <node ref="U1" pin="3"/>
+    </net>
+    <net code="7" name="Net-(U1-Pad4)">
+      <node ref="U1" pin="4"/>
+    </net>
+    <net code="8" name="Net-(U1-Pad5)">
+      <node ref="U1" pin="5"/>
+    </net>
+    <net code="9" name="/ToMOSI">
+      <node ref="U1" pin="1"/>
+      <node ref="HDR_OLED2" pin="6"/>
+      <node ref="HDR_OLED1" pin="6"/>
+    </net>
+    <net code="10" name="/ToPly2Btn">
+      <node ref="U1" pin="8"/>
+      <node ref="R1" pin="1"/>
+      <node ref="HDR_BUTTONS_MCU1" pin="2"/>
+    </net>
+    <net code="11" name="/ToCS2">
+      <node ref="HDR_OLED2" pin="8"/>
+      <node ref="U1" pin="13"/>
+    </net>
+    <net code="12" name="+5V">
+      <node ref="HDR_OLED1" pin="1"/>
+      <node ref="HDR_OLED2" pin="1"/>
+      <node ref="U1" pin="29"/>
+    </net>
+    <net code="13" name="/ToDC2">
+      <node ref="U1" pin="14"/>
+      <node ref="HDR_OLED2" pin="9"/>
+    </net>
+    <net code="14" name="/ToRST2">
+      <node ref="U1" pin="15"/>
+      <node ref="HDR_OLED2" pin="10"/>
+    </net>
+    <net code="15" name="GND">
+      <node ref="U1" pin="6"/>
+      <node ref="R3" pin="1"/>
+      <node ref="R1" pin="2"/>
+      <node ref="R2" pin="1"/>
+      <node ref="HDR_OLED1" pin="2"/>
+      <node ref="HDR_OLED2" pin="2"/>
+    </net>
+    <net code="16" name="Net-(U1-Pad18)">
+      <node ref="U1" pin="18"/>
+    </net>
+    <net code="17" name="/ToRstBtn">
+      <node ref="U1" pin="9"/>
+      <node ref="R3" pin="2"/>
+      <node ref="HDR_BUTTONS_MCU1" pin="3"/>
+    </net>
+    <net code="18" name="Net-(U1-Pad16)">
+      <node ref="U1" pin="16"/>
+    </net>
+    <net code="19" name="Net-(U1-Pad17)">
+      <node ref="U1" pin="17"/>
+    </net>
+    <net code="20" name="Net-(U1-Pad26)">
+      <node ref="U1" pin="26"/>
+    </net>
+    <net code="21" name="Net-(U1-Pad25)">
+      <node ref="U1" pin="25"/>
+    </net>
+    <net code="22" name="Net-(U1-Pad24)">
+      <node ref="U1" pin="24"/>
+    </net>
+    <net code="23" name="Net-(U1-Pad23)">
+      <node ref="U1" pin="23"/>
+    </net>
+    <net code="24" name="Net-(U1-Pad22)">
+      <node ref="U1" pin="22"/>
+    </net>
+    <net code="25" name="Net-(U1-Pad21)">
+      <node ref="U1" pin="21"/>
+    </net>
+    <net code="26" name="Net-(U1-Pad20)">
+      <node ref="U1" pin="20"/>
+    </net>
+    <net code="27" name="Net-(U1-Pad19)">
+      <node ref="U1" pin="19"/>
+    </net>
+    <net code="28" name="Net-(U1-Pad30)">
+      <node ref="U1" pin="30"/>
+    </net>
+    <net code="29" name="Net-(U1-Pad32)">
+      <node ref="U1" pin="32"/>
+    </net>
+    <net code="30" name="Net-(U1-Pad33)">
+      <node ref="U1" pin="33"/>
+    </net>
+    <net code="31" name="Net-(U1-Pad31)">
+      <node ref="U1" pin="31"/>
+    </net>
+    <net code="32" name="/ToPly1Btn">
+      <node ref="R2" pin="2"/>
+      <node ref="U1" pin="7"/>
+      <node ref="HDR_BUTTONS_MCU1" pin="1"/>
+    </net>
+    <net code="33" name="Net-(HDR_OLED2-Pad3)">
+      <node ref="HDR_OLED2" pin="3"/>
+    </net>
+    <net code="34" name="Net-(HDR_BUTTONS_MCU1-Pad4)">
+      <node ref="HDR_BUTTONS_MCU1" pin="4"/>
+    </net>
+    <net code="35" name="Net-(HDR_BUTTONS_MCU1-Pad5)">
+      <node ref="HDR_BUTTONS_MCU1" pin="5"/>
+    </net>
+    <net code="36" name="Net-(HDR_BUTTONS_MCU1-Pad6)">
+      <node ref="HDR_BUTTONS_MCU1" pin="6"/>
+    </net>
+    <net code="37" name="Net-(HDR_OLED2-Pad5)">
+      <node ref="HDR_OLED2" pin="5"/>
+    </net>
+    <net code="38" name="Net-(HDR_OLED2-Pad4)">
+      <node ref="HDR_OLED2" pin="4"/>
+    </net>
+    <net code="39" name="Net-(HDR_OLED1-Pad3)">
+      <node ref="HDR_OLED1" pin="3"/>
+    </net>
+    <net code="40" name="Net-(HDR_OLED1-Pad5)">
+      <node ref="HDR_OLED1" pin="5"/>
+    </net>
+    <net code="41" name="Net-(HDR_OLED1-Pad4)">
+      <node ref="HDR_OLED1" pin="4"/>
+    </net>
+    <net code="42" name="Net-(U1-Pad27)">
+      <node ref="U1" pin="27"/>
+    </net>
+    <net code="43" name="Net-(U1-Pad28)">
+      <node ref="U1" pin="28"/>
+    </net>
+  </nets>
+</export>
