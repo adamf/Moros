@@ -53,8 +53,7 @@ public:
   }
 
   void reset() {
- //   oled->background(0,0,0);
- //   memset(prev_text, 0, sizeof(prev_text));
+    oled->clearScreen();
   }
 };
 
