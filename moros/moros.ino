@@ -1,12 +1,8 @@
 /* 
 * TODO:
-* reset button (chronos style?) - P1
 * time setting - P1
 * case - P1
-* wiring diagram - P2 S3
-* pause - P2
-* have graphical representation of flag P3
-* OLEDs
+* display tenths of a second - P2
 * 
 */
 
@@ -43,6 +39,7 @@ public:
     pressed_at(0),
     pin_number(pin_number_) {
     pinMode(pin_number, INPUT);
+    digitalWrite(pin_number, HIGH); // connect the internal pull-up resistor
   };
 
   // returns the number of ms for which the button has been held down
@@ -50,7 +47,7 @@ public:
     int pin_status = digitalRead(pin_number);
     // serprintf("PollButton::poll: status is %d (%s)\r\n", pin_status, pin_status == HIGH ? "high" : "not high");
 
-    if (pin_status == HIGH) {
+    if (pin_status == LOW) {
       if (!pressed) {
         pressed_at = millis();
         pressed = true;
@@ -59,7 +56,7 @@ public:
 
       //serprintf("pressed_at=%lu, millis=%lu\r\n", pressed_at, millis());
       return millis()-pressed_at;
-    } else if (pin_status == LOW) {
+    } else if (pin_status == HIGH) {
       if (pressed)
         serprintf("PollButton::poll: released\r\n");
       pressed = false;
@@ -134,6 +131,7 @@ public:
     }
     last_update_ms = millis();
   };
+
 
   bool flag() {
     return time_remaining_ms == 0;
@@ -221,7 +219,8 @@ void handle_interrupt_1();
 class Controller {
 protected:
   const unsigned long reset_button_reset_ms = 3000;
-  const unsigned long reset_button_poweroff_ms = 5000;
+  const unsigned long reset_button_settime_ms = 5000;
+  const unsigned long reset_button_poweroff_ms = 7000;
   enum { INIT, PRE_GAME, IN_PROGRESS, PAUSED } game_state;
 public:
   Player *players[2];
@@ -267,6 +266,18 @@ public:
     //serprintf("Power off\r\n");
   }
 
+  void pause() {
+    if (game_state == PAUSED) {
+      return;
+    }
+    serprintf("Pausing.\r\n");
+    game_state = PAUSED;
+  }
+
+  void set_time() {
+    serprintf("Set time\r\n");
+  }
+
   void reset() {
     if (game_state == PRE_GAME) return;
 
@@ -310,10 +321,14 @@ public:
     }
 
     unsigned long reset_button_held = reset_button->poll();
-    //if (reset_button_held > 0)
-    //  serprintf("reset button was held for %d\r\n", reset_button_held);
+    if (reset_button_held > 0) {
+      pause();
+//      serprintf("reset button was held for %d\r\n", reset_button_held);
+    }
     if (reset_button_held > reset_button_poweroff_ms) {
       power_off();
+    } else if (reset_button_held > reset_button_settime_ms) {
+      set_time();
     } else if (reset_button_held > reset_button_reset_ms) {
       reset();
     }
@@ -333,7 +348,9 @@ public:
     }
 
     // Update the clock
-    players[active_player]->tick();
+    if (game_state == IN_PROGRESS) {
+      players[active_player]->tick();
+    }
   }
 };
 int Controller::active_player = NONE;
