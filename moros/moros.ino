@@ -1,6 +1,5 @@
 /* 
 * TODO:
-* reset button (chronos style?) - P1
 * time setting - P1
 * case - P1
 * wiring diagram - P2 S3
@@ -43,6 +42,7 @@ public:
     pressed_at(0),
     pin_number(pin_number_) {
     pinMode(pin_number, INPUT);
+    digitalWrite(pin_number, HIGH); // connect the internal pull-up resistor
   };
 
   // returns the number of ms for which the button has been held down
@@ -50,7 +50,7 @@ public:
     int pin_status = digitalRead(pin_number);
     // serprintf("PollButton::poll: status is %d (%s)\r\n", pin_status, pin_status == HIGH ? "high" : "not high");
 
-    if (pin_status == HIGH) {
+    if (pin_status == LOW) {
       if (!pressed) {
         pressed_at = millis();
         pressed = true;
@@ -59,7 +59,7 @@ public:
 
       //serprintf("pressed_at=%lu, millis=%lu\r\n", pressed_at, millis());
       return millis()-pressed_at;
-    } else if (pin_status == LOW) {
+    } else if (pin_status == HIGH) {
       if (pressed)
         serprintf("PollButton::poll: released\r\n");
       pressed = false;
