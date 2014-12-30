@@ -1,3 +1,0 @@
-[submodule "shield/ft_library"]
-	path = shield/ft_library
-	url = git@github.com:/freetronics/freetronics_kicad_library
