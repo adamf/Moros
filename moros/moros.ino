@@ -2,10 +2,8 @@
 * TODO:
 * time setting - P1
 * case - P1
-* wiring diagram - P2 S3
-* pause - P2
+* display tenths of a second - P2
 * have graphical representation of flag P3
-* OLEDs
 * 
 */
 
