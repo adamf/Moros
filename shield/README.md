@@ -27,8 +27,8 @@ a netlist generated, and a PCB laid out. The PCB in this repo is suitable for ex
 In order to send those Gerber format files to the preferred fab, [http://oshpark.com](OSH Park), the Gerber
 files output by KiCad must be renamed:
 
-   cd gerber
-   bash rename_and_zip.sh
+    cd gerber
+    bash rename_and_zip.sh
 
 The resulting .zip file can be uploaded to OSH Park for fabrication.
 
