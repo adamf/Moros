@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <export version="D">
   <design>
-    <source>/home/adamf/src/Moros/shield/moros.sch</source>
+    <source>moros.sch</source>
     <date>Sun 21 Dec 2014 02:11:00 PM PST</date>
     <tool>Eeschema 0.201412191901+5326~19~ubuntu14.04.1-product</tool>
   </design>
@@ -155,10 +155,10 @@
       <uri>/usr/share/kicad/library/device.lib</uri>
     </library>
     <library logical="moros">
-      <uri>/home/adamf/src/Moros/shield/moros.lib</uri>
+      <uri>moros.lib</uri>
     </library>
     <library logical="arduino_micro_shield">
-      <uri>/home/adamf/src/arduino_micro_shield/arduino_micro_shield.lib</uri>
+      <uri>arduino_micro_shield/arduino_micro_shield.lib</uri>
     </library>
   </libraries>
   <nets>
