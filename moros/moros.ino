@@ -3,7 +3,6 @@
 * time setting - P1
 * case - P1
 * display tenths of a second - P2
-* have graphical representation of flag P3
 * 
 */
 
