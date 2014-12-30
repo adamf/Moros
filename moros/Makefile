@@ -4,3 +4,6 @@ MONITOR_PORT = /dev/ttyACM0
 MONITOR_BAUDRATE = 115200
 
 include /usr/share/arduino/Arduino.mk
+
+cccp_flag.h: cccp_flag.bmp
+	python3 utils/bin2header.py $<

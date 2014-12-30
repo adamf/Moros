@@ -1,6 +1,6 @@
 
 // Generated with bin2header.py by Freetronics
-// Source file name: /home/adamf/Desktop/cccp_flag.bmp
+// Source file name: cccp_flag.bmp
 
 #include <stdint.h>
 
