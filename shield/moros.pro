@@ -1,8 +1,6 @@
-update=Sun 21 Dec 2014 02:56:03 PM PST
+update=Tue 30 Dec 2014 10:32:47 AM PST
 version=1
 last_client=kicad
-[general]
-version=1
 [cvpcb]
 version=1
 NetIExt=net
@@ -30,7 +28,7 @@ BoardOutlineThickness=0.09999999999999999
 ModuleOutlineThickness=0.15
 [eeschema]
 version=1
-LibDir=ft_library/freetronics_footprints.pretty;/home/adamf/src/KiCad/modules/ab2_idc.pretty;/home/adamf/src/KiCad/modules/ab2_header.pretty
+LibDir=KiCad/library;arduino_micro_shield
 [eeschema/libraries]
 LibName1=power
 LibName2=device
@@ -62,8 +60,9 @@ LibName27=opto
 LibName28=atmel
 LibName29=contrib
 LibName30=valves
-LibName31=ab2_idc
-LibName32=ab2_header
-LibName33=moros
-LibName34=ft_library/freetronics_schematic
-LibName35=arduino_micro_shield
+LibName31=moros
+LibName32=arduino_micro_shield/arduino_micro_shield
+LibName33=KiCad/library/ab2_idc
+LibName34=KiCad/library/ab2_header
+[general]
+version=1

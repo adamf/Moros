@@ -30,8 +30,9 @@ LIBS:atmel
 LIBS:contrib
 LIBS:valves
 LIBS:moros
-LIBS:freetronics_schematic
 LIBS:arduino_micro_shield
+LIBS:ab2_idc
+LIBS:ab2_header
 LIBS:moros-cache
 EELAYER 25 0
 EELAYER END
