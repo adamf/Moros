@@ -3,6 +3,7 @@
 
 #include <fonts/Droid_Sans_36.h>
 #include "fonts/TulpenOneMono96.h"
+#include "cccp_flag.h"
 
 class Screen {
 private:
@@ -48,12 +49,7 @@ public:
   }
 
   void display_flag() {
-/*
-    oled->stroke(0,0,255);
-    oled->fill(0,0,255);
-    oled->rect(margin_left, margin_top + fonts[FONT].char_height_px + margin_middle,
-              oled->width() * 2 / 3, fonts[FONT].char_height_px);
-*/
+    oled->displayBMP(cccp_flag, 0, 0);
   }
 
   void reset() {
