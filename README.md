@@ -23,14 +23,14 @@ was built for the Arduino Uno and Arduino Micro. The software was built and test
 but should build for any platform with small changes to the Makefile.
 
 For Ubuntu 14.04, the packages required can be installed with:
-    sudo apt-get update && apt-get install arduino arduino-code arduino-mk
+     sudo apt-get update && apt-get install arduino arduino-code arduino-mk
 
 And then to build & install on the microcontroller:
-    cd moros
-    make upload
+     cd moros
+     make upload
 
 We also provide serial port debug output (this starts screen(1), quit with ctrl-a k):
-    make upload monitor
+     make upload monitor
 
 Case
 ====
