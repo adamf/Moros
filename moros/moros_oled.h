@@ -24,7 +24,7 @@ public:
 	oled->selectFont(Tulpen_One_Mono_96);
 	main_clock_box = new OLED_TextBox(*oled, 12, 48, 108, 76);
 	main_clock_box->setForegroundColor(WHITE);
-	main_clock_box->setBackgroundColor(RED);
+	main_clock_box->setBackgroundColor(BLACK);
 
 	secondary_clock_box = new OLED_TextBox(*oled, 88, 0, 36, 42);
 	secondary_clock_box->setForegroundColor(WHITE);
