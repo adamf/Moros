@@ -84,7 +84,9 @@ public:
       pressed_at = 0;
       state->pressed = false;
       state->just_released = true;
+      state->press_duration_ms = 0;
       //state.press_duration_ms = 0;
+      return state;
     } else {
       // ???
       serprintf("PollButton::poll: unrecognized return value from digitalRead: %d\r\n", pin_status);
@@ -227,7 +229,7 @@ protected:
   const unsigned long mode_button_reset_ms = 3000;
   const unsigned long mode_button_settime_ms = 5000;
   const unsigned long mode_button_poweroff_ms = 7000;
-  enum { INIT, PRE_GAME, IN_PROGRESS, PAUSED, SET_TIME } game_state;
+  enum { INIT, PRE_GAME, IN_PROGRESS, PAUSED, SET_TIME, SET_TIME_CLOCK_1, SET_TIME_CLOCK_2 } game_state;
   bool mode_button_last_pressed_state;
   unsigned long blink_start_ms;
 public:
@@ -316,6 +318,8 @@ public:
     if (game_state == PRE_GAME) return;
     serprintf("Controller reset...\r\n");
     game_state = PRE_GAME;
+    active_player = NONE;
+    clock_being_set = 0;
 
     for(unsigned int i = 0; i < NUM_PLAYERS; i++) {
       serprintf("player %d clock...\r\n", i);
@@ -325,15 +329,48 @@ public:
       serprintf("player %d update_display...\r\n", i);
       players[i]->update_display();
     }
-    active_player = NONE;
-    clock_being_set = 0;
     serprintf("Controller reset complete.\r\n");
   }
 
   void handle_mode_button() {
 
     ButtonState *state = mode_button->poll();
+    
+    unsigned long press_duration_ms = state->press_duration_ms; 
+    bool button_pressed = state->pressed;
+    bool just_released = state->just_released;
 
+    
+    switch (game_state) {
+      case PRE_GAME:
+        if (button_pressed) {
+          if (press_duration_ms > mode_button_settime_ms) {
+            set_time();
+          } 
+        }
+        break;
+      case IN_PROGRESS:
+        if (button_pressed) {
+          if (press_duration_ms > mode_button_reset_ms) {
+            reset();
+          } else if (press_duration_ms > 0) {
+            pause();
+          }
+        }
+        break;
+      case SET_TIME:
+        if (just_released) {
+          game_state = SET_TIME_CLOCK_1;
+        }
+        break;
+      case SET_TIME_CLOCK_1:
+      case SET_TIME_CLOCK_2:
+        if (press_duration_ms > 0) {
+          set_time_next_step();
+        }
+        break;
+    }
+/*
     //unsigned long mode_button_held = mode_button->poll();
     unsigned long mode_button_held = state->press_duration_ms; 
     bool button_pressed = state->pressed;
@@ -353,11 +390,7 @@ public:
 //      serprintf("mode button, _in_ SET_TIME, button_pressed is %d held for %lu and previous %lu\r\n", button_pressed, mode_button_held, mode_button_previous_hold_time_ms);
       // we don't want to be in here because we changed state but the button is still pressed
 
-      //if (mode_button_held > 0 && !button_pressed && mode_button_last_pressed_at_ms != state->pressed_at) {
       if ((mode_button_held < mode_button_previous_hold_time_ms) && !button_pressed) {
-      //if (mode_button_held > 0 && !button_pressed && mode_button_last_pressed_state) {
-      
-      //if (mode_button_held > 0 && !button_pressed) {
         serprintf("reset button was held for %lu and is pressed: %d\r\n", state->press_duration_ms, state->pressed);
         // move to the next clock to set or exit
         serprintf("in handle_mode_button, calling set_time_next_step\r\n");
@@ -378,6 +411,7 @@ public:
 //      serprintf("mode_button_held %lu mode_button_previous_hold_time_ms %lu\r\n", mode_button_held, mode_button_previous_hold_time_ms);
       mode_button_previous_hold_time_ms = mode_button_held;
     }
+    */
   }
 
 
@@ -419,7 +453,7 @@ public:
         active_player = (player_who_pressed+1) % 2;
         players[active_player]->clock->start();
       } else {
-        serprintf("Ignoring button press for inactive player %d\r\n", player_who_pressed);
+        //serprintf("Ignoring button press for inactive player %d\r\n", player_who_pressed);
       }
       interrupt_fired = NONE;
     }
@@ -454,6 +488,12 @@ public:
         serprintf("Received interrupt %d, but no player has a button on that interrupt!\r\n", interrupt_fired);
         return;
       }
+
+      if (active_player == NONE) {
+        serprintf("Supposed to pause, but there's no active palyer\r\n");
+        return;
+      }
+
       game_state = IN_PROGRESS;
       interrupt_fired = NONE;
     }
@@ -465,30 +505,32 @@ public:
 
     switch (game_state) {
       case INIT:
+        return;
         break;
       case PRE_GAME:
         handle_pre_game_player_buttons();
-        handle_mode_button();
         break;
       case IN_PROGRESS:
         handle_in_progress_player_buttons();
-        handle_mode_button();
         if (players[active_player]->out_of_time()) {
           players[active_player]->flag();
-        } else {
-          players[active_player]->tick();
-        }
+          break;
+        } 
+        players[active_player]->tick();
         break;
       case SET_TIME:
+      case SET_TIME_CLOCK_1:
+      case SET_TIME_CLOCK_2:
         handle_set_time_player_buttons();
-        handle_mode_button();
         break;
       case PAUSED:
         handle_paused_player_buttons();
         break;
       default:
+        serprintf("Should not get here; default case of controller tick switch!\r\n");
         break;
     }
+    handle_mode_button();
 /*
     if (interrupt_fired != NONE) {
       // Someone pressed a button since the last time we checked.
