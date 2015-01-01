@@ -311,7 +311,6 @@ public:
       serprintf("Done setting clocks, resetting\r\n");
       reset();
     }
-    // XXX blink the clocks correctly
   }
 
   void reset() {
@@ -339,7 +338,7 @@ public:
     unsigned long press_duration_ms = state->press_duration_ms; 
     bool button_pressed = state->pressed;
     bool just_released = state->just_released;
-
+//    serprintf("bp: %d jr: %d dms: %lu gs: %d\r\n", button_press, just_released, press_duration_ms, game_state);
     
     switch (game_state) {
       case PRE_GAME:
@@ -351,11 +350,14 @@ public:
         break;
       case IN_PROGRESS:
         if (button_pressed) {
-          if (press_duration_ms > mode_button_reset_ms) {
-            reset();
-          } else if (press_duration_ms > 0) {
+          if (press_duration_ms > 0) {
             pause();
           }
+        }
+        break;
+      case PAUSED:
+        if (press_duration_ms > mode_button_reset_ms) {
+          reset();
         }
         break;
       case SET_TIME:
@@ -365,53 +367,11 @@ public:
         break;
       case SET_TIME_CLOCK_1:
       case SET_TIME_CLOCK_2:
-        if (press_duration_ms > 0) {
+        if (just_released) {
           set_time_next_step();
         }
         break;
     }
-/*
-    //unsigned long mode_button_held = mode_button->poll();
-    unsigned long mode_button_held = state->press_duration_ms; 
-    bool button_pressed = state->pressed;
-
-    if (game_state != SET_TIME && button_pressed) {
-      if (mode_button_held > 0) {
-        pause();
-      }
-      if (mode_button_held > mode_button_poweroff_ms) {
-        power_off();
-      } else if (mode_button_held > mode_button_settime_ms) {
-        set_time(); 
-      } else if (mode_button_held > mode_button_reset_ms) {
-        reset();
-      }
-    } else if (game_state == SET_TIME) {
-//      serprintf("mode button, _in_ SET_TIME, button_pressed is %d held for %lu and previous %lu\r\n", button_pressed, mode_button_held, mode_button_previous_hold_time_ms);
-      // we don't want to be in here because we changed state but the button is still pressed
-
-      if ((mode_button_held < mode_button_previous_hold_time_ms) && !button_pressed) {
-        serprintf("reset button was held for %lu and is pressed: %d\r\n", state->press_duration_ms, state->pressed);
-        // move to the next clock to set or exit
-        serprintf("in handle_mode_button, calling set_time_next_step\r\n");
-        set_time_next_step();
-      }
-    } else {
-      if (mode_button_held > 0 && button_pressed) {
-        serprintf("Mode button held for %lu an is pressed=%d with game state:%d\r\n", mode_button_held, button_pressed, game_state);
-      }
-    }
-    mode_button_last_pressed_state = state->pressed;
-
-    if (mode_button_last_pressed_at_ms != state->pressed_at) {
-        mode_button_last_pressed_at_ms = state->pressed_at;
-    }
-
-    if (!button_pressed && (mode_button_held < mode_button_previous_hold_time_ms || mode_button_previous_hold_time_ms == 0)) {
-//      serprintf("mode_button_held %lu mode_button_previous_hold_time_ms %lu\r\n", mode_button_held, mode_button_previous_hold_time_ms);
-      mode_button_previous_hold_time_ms = mode_button_held;
-    }
-    */
   }
 
 
@@ -502,7 +462,6 @@ public:
 
   void tick() {
     unsigned long tick_ms = millis(); // the start of this tick
-
     switch (game_state) {
       case INIT:
         return;
@@ -519,9 +478,16 @@ public:
         players[active_player]->tick();
         break;
       case SET_TIME:
+        break;
       case SET_TIME_CLOCK_1:
       case SET_TIME_CLOCK_2:
         handle_set_time_player_buttons();
+        if (tick_ms > blink_start_ms + 1500) {
+           blink_start_ms = tick_ms;
+           players[clock_being_set]->blank_text();
+        } else if (tick_ms > blink_start_ms + 500) {
+           players[clock_being_set]->update_display();
+        }
         break;
       case PAUSED:
         handle_paused_player_buttons();
@@ -531,69 +497,6 @@ public:
         break;
     }
     handle_mode_button();
-/*
-    if (interrupt_fired != NONE) {
-      // Someone pressed a button since the last time we checked.
-      int player_who_pressed = interrupt_to_player(interrupt_fired);
-
-      if (player_who_pressed == NONE) {
-        // Unrecognized button interrupt
-        serprintf("received interrupt %d, but no player has a button on that interrupt!\r\n", interrupt_fired);
-
-      } else if (game_state != SET_TIME && (active_player == NONE || player_who_pressed == active_player)) {
-        // either it was nobody's turn, or the active player pressed their button
-        serprintf("Got a player button press from button %d\r\n", player_who_pressed);
-
-        if (players[player_who_pressed]->out_of_time()) {
-          // the other player is already out of time, so ignore
-          active_player = NONE;
-        } else {
-          serprintf("Player %d ended turn by button press.\r\n", player_who_pressed);
-          // switch to the opposite player from the one whose button was pressed
-          active_player = (player_who_pressed+1) % 2;
-          game_state = IN_PROGRESS;
-          players[active_player]->clock->start();
-        }
-      } else if (game_state == SET_TIME) {
-        serprintf("Setting the time, got player button %d clock being set:%d\r\n", player_who_pressed, clock_being_set);
-        if (player_who_pressed == 0) {
-          players[clock_being_set]->clock->add_minute();
-        } else if (player_who_pressed == 1) {
-          players[clock_being_set]->clock->subtract_minute();
-        }
-      } else {
-        serprintf("Ignoring button press for inactive player %d\r\n", player_who_pressed);
-      }
-
-      interrupt_fired = NONE;
-    }
-
-    handle_mode_button();
-
-    if (active_player != NONE) {
-      // It's someone's turn:
-
-      // Check for flag
-      if (players[active_player]->out_of_time()) {
-        serprintf("Flag fell for player %d\r\n", active_player);
-        players[active_player]->flag();
-        active_player = NONE;
-        return;
-      }
-      if (game_state == IN_PROGRESS) {
-        players[active_player]->tick();
-      }
-    }
-
-    if (game_state == SET_TIME) {
-      if (tick_ms > blink_start_ms + 1500) {
-         blink_start_ms = tick_ms;
-         players[clock_being_set]->blank_text();
-      } else if (tick_ms > blink_start_ms + 500) {
-         players[clock_being_set]->update_display();
-      }
-    }
-    */
   }
 };
 int Controller::active_player = NONE;
