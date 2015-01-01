@@ -230,14 +230,12 @@ protected:
   const unsigned long mode_button_settime_ms = 5000;
   const unsigned long mode_button_poweroff_ms = 7000;
   enum { INIT, PRE_GAME, IN_PROGRESS, PAUSED, SET_TIME, SET_TIME_CLOCK_1, SET_TIME_CLOCK_2 } game_state;
-  bool mode_button_last_pressed_state;
   unsigned long blink_start_ms;
 public:
   Player *players[NUM_PLAYERS];
   PollButton *mode_button;
   static int active_player;
   unsigned clock_being_set;
-  unsigned long mode_button_previous_hold_time_ms;
   unsigned long mode_button_last_pressed_at_ms;
   volatile static int interrupt_fired;
 
@@ -253,9 +251,7 @@ public:
     mode_button = new PollButton(A0);
     game_state = INIT;
     clock_being_set = 0;
-    mode_button_previous_hold_time_ms = 0;
     mode_button_last_pressed_at_ms = 0;
-    mode_button_last_pressed_state = false;
     blink_start_ms = 0;
   }
 
@@ -336,9 +332,15 @@ public:
     ButtonState *state = mode_button->poll();
     
     unsigned long press_duration_ms = state->press_duration_ms; 
+    unsigned long pressed_at = state->pressed_at;
     bool button_pressed = state->pressed;
     bool just_released = state->just_released;
-//    serprintf("bp: %d jr: %d dms: %lu gs: %d\r\n", button_press, just_released, press_duration_ms, game_state);
+    bool new_button_press = false;
+    if (pressed_at != mode_button_last_pressed_at_ms) {
+      new_button_press = true;
+      mode_button_last_pressed_at_ms = pressed_at;
+    }
+//    serprintf("bp: %d jr: %d dms: %lu gs: %d\r\n", button_pressed, just_released, press_duration_ms, game_state);
     
     switch (game_state) {
       case PRE_GAME:
@@ -367,7 +369,7 @@ public:
         break;
       case SET_TIME_CLOCK_1:
       case SET_TIME_CLOCK_2:
-        if (just_released) {
+        if (press_duration_ms > 0 && new_button_press) {
           set_time_next_step();
         }
         break;
