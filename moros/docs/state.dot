@@ -1,0 +1,21 @@
+digraph {
+    START
+    INIT
+    PRE_GAME
+    IN_PROGRESS
+    PAUSED
+    SET_TIME_CLOCK_1
+    SET_TIME_CLOCK_2
+    
+
+    START -> INIT
+    INIT -> PRE_GAME [label="Device booted"]
+    PRE_GAME -> IN_PROGRESS [label="Player button pressed"]
+    PAUSED -> IN_PROGRESS [label="Player button pressed"]
+    PAUSED -> PRE_GAME [label="Mode button held for 3 seconds"]
+    PRE_GAME -> SET_TIME_CLOCK_1 [label="Mode button held for 7 seconds"]
+    SET_TIME_CLOCK_1 -> SET_TIME_CLOCK_2 [label="Mode button tapped"]
+    SET_TIME_CLOCK_2 -> PRE_GAME [label="Mode button tapped"]
+    IN_PROGRESS -> PAUSED [label="Mode button tapped"]
+
+}
