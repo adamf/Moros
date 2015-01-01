@@ -25,6 +25,7 @@ public:
   bool pressed = false;
   unsigned long press_duration_ms = 0;
   unsigned long pressed_at = 0;
+  bool just_released = false;
 };
 
 class Button {
@@ -51,6 +52,7 @@ public:
     state->pressed = false;
     state->press_duration_ms = 0;
     state->pressed_at = 0;
+    state->just_released = false;
     pinMode(pin_number, INPUT);
     digitalWrite(pin_number, HIGH); // connect the internal pull-up resistor
   };
@@ -58,6 +60,7 @@ public:
   // returns the number of ms for which the button has been held down, and if the button is still pressed.
   ButtonState* poll() {
     int pin_status = digitalRead(pin_number);
+    state->just_released = false;
     // serprintf("PollButton::poll: status is %d (%s)\r\n", pin_status, pin_status == HIGH ? "high" : "not high");
 
     if (pin_status == LOW) {
@@ -80,6 +83,7 @@ public:
       pressed = false;
       pressed_at = 0;
       state->pressed = false;
+      state->just_released = true;
       //state.press_duration_ms = 0;
     } else {
       // ???
