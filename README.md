@@ -47,13 +47,13 @@ See the README.md file in the shield/ directory in this repository.
 
 TODO
 ====
-* Support setting the time outside of the code
 * Support displaying hours
 * Re-add displaying 10th of a second
 * Update case to reflect use of arcade-style buttons
 * Update case to reflect the reset button
 * Update shield to reflect reset button to ground, not VCC
 * Clean up case SCAD code, and add README and Makefile for generation of 3D-printable models
+* Support saving the time between reboots
 
 
 Copyright 2014 Adam Fletcher and Matt Zimmerman

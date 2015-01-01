@@ -1,6 +1,6 @@
 /* 
 * TODO:
-* time setting - P1
+* Fix screen staying blank if you switch clock being set in the middle of a blink - P2
 * case - P1
 * display tenths of a second - P2
 * 
