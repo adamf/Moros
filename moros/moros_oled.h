@@ -6,11 +6,6 @@
 #include "cccp_flag.h"
 
 class Screen {
-private:
-  const unsigned margin_top = 20;
-  const unsigned margin_left = 2;
-  const unsigned margin_middle = 10;
-
 public:
   OLED *oled;
   OLED_TextBox *main_clock_box;

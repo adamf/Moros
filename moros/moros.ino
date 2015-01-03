@@ -7,8 +7,6 @@
 */
 
 #include <SPI.h>
-//#include <SD.h>
-//#include <TFT.h>
 #include <FTOLED.h>
 #include "moros_oled.h"
 #include "printf.h"
