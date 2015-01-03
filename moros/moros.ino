@@ -1,6 +1,8 @@
 /* 
 * TODO:
 * Fix screen staying blank if you switch clock being set in the middle of a blink - P2
+* Remove duplicate state in PollButton
+* Remove duplicate interrupt checking code from handle_player_buttons*
 * case - P1
 * display tenths of a second - P2
 * 
@@ -83,7 +85,6 @@ public:
       state->pressed = false;
       state->just_released = true;
       state->press_duration_ms = 0;
-      //state.press_duration_ms = 0;
       return state;
     } else {
       // ???
@@ -298,6 +299,7 @@ public:
   }
 
   void set_time_next_step() {
+    players[clock_being_set]->update_display();
     clock_being_set++;
     blink_start_ms = 0;
     if (clock_being_set >= NUM_PLAYERS) {
