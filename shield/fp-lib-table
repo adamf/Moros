@@ -1,5 +1,5 @@
 (fp_lib_table
   (lib (name ab2_idc)(type KiCad)(uri ${KIPRJMOD}/KiCad/modules/ab2_idc.pretty)(options "")(descr ""))
   (lib (name ab2_header)(type KiCad)(uri ${KIPRJMOD}/KiCad/modules/ab2_header.pretty)(options "")(descr ""))
-  (lib (name arduino_micro_shield)(type KiCad)(uri ${KIPRJMOD/arduino_micro_shield/arduino_micro_shield.pretty)(options "")(descr ""))
+  (lib (name arduino_micro_shield)(type KiCad)(uri ${KIPRJMOD}/arduino_micro_shield/arduino_micro_shield.pretty)(options "")(descr ""))
 )
