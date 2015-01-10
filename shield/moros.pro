@@ -1,4 +1,4 @@
-update=Tue 30 Dec 2014 10:32:47 AM PST
+update=Fri 09 Jan 2015 08:34:11 PM PST
 version=1
 last_client=kicad
 [cvpcb]
@@ -26,6 +26,8 @@ SolderMaskMinWidth=0
 DrawSegmentWidth=0.2
 BoardOutlineThickness=0.09999999999999999
 ModuleOutlineThickness=0.15
+[general]
+version=1
 [eeschema]
 version=1
 LibDir=KiCad/library;arduino_micro_shield
@@ -64,5 +66,3 @@ LibName31=moros
 LibName32=arduino_micro_shield/arduino_micro_shield
 LibName33=KiCad/library/ab2_idc
 LibName34=KiCad/library/ab2_header
-[general]
-version=1
