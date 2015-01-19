@@ -225,9 +225,9 @@ void handle_interrupt_1();
 
 class Controller {
 protected:
-  const unsigned long mode_button_reset_ms = 3000;
-  const unsigned long mode_button_settime_ms = 5000;
-  const unsigned long mode_button_poweroff_ms = 7000;
+  const unsigned long mode_button_reset_ms = 1000;
+  const unsigned long mode_button_settime_ms = 3000;
+  const unsigned long mode_button_poweroff_ms = 5000;
   enum { INIT, PRE_GAME, IN_PROGRESS, PAUSED, SET_TIME, SET_TIME_CLOCK_1, SET_TIME_CLOCK_2 } game_state;
 public:
   Player *players[NUM_PLAYERS];
