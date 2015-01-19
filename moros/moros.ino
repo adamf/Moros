@@ -229,7 +229,6 @@ protected:
   const unsigned long mode_button_settime_ms = 5000;
   const unsigned long mode_button_poweroff_ms = 7000;
   enum { INIT, PRE_GAME, IN_PROGRESS, PAUSED, SET_TIME, SET_TIME_CLOCK_1, SET_TIME_CLOCK_2 } game_state;
-  unsigned long blink_start_ms;
 public:
   Player *players[NUM_PLAYERS];
   PollButton *mode_button;
@@ -251,7 +250,6 @@ public:
     game_state = INIT;
     clock_being_set = 0;
     mode_button_last_pressed_at_ms = 0;
-    blink_start_ms = 0;
   }
 
   void init() {
@@ -301,7 +299,6 @@ public:
   void set_time_next_step() {
     players[clock_being_set]->update_display();
     clock_being_set++;
-    blink_start_ms = 0;
     if (clock_being_set >= NUM_PLAYERS) {
       clock_being_set = 0;
       serprintf("Done setting clocks, resetting\r\n");
@@ -484,10 +481,9 @@ public:
       case SET_TIME_CLOCK_1:
       case SET_TIME_CLOCK_2:
         handle_set_time_player_buttons();
-        if (tick_ms > blink_start_ms + 1500) {
-           blink_start_ms = tick_ms;
+        if (tick_ms % 1000 > 800) {
            players[clock_being_set]->blank_text();
-        } else if (tick_ms > blink_start_ms + 500) {
+        } else {
            players[clock_being_set]->update_display();
         }
         break;
