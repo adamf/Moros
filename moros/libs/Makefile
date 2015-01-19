@@ -4,6 +4,7 @@ clean:
 	rm -rf FTOLED
 
 FTOLED: FTOLED-master.zip
+	rm -rf FTOLED-master FTOLED
 	unzip $<
 	mv FTOLED-master $@
 	rm $<
